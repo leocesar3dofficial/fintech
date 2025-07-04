@@ -43,23 +43,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-        String username = null;
-        String email = null;
-        // Try to extract username/email from known types
-        if (principal instanceof com.leo.fintech.config.User user) {
-            username = user.getUsername();
-            email = user.getEmail();
-        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
-            email = userDetails.getUsername();
-            username = null;
-            // Try to get username from UserRepository if possible
-            // Optionally, inject UserRepository and look up by email
-        } else if (principal instanceof String str) {
-            email = str;
-            username = null;
-        }
-        return ResponseEntity.ok(new UserDto(username != null ? username : email, email));
+        return ResponseEntity.ok(authService.getUserDto(authentication));
     }
 
     @PostMapping("/logout")

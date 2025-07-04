@@ -1,7 +1,7 @@
 package com.leo.fintech.config;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +16,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
+    
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return new AuthResponse("Email already in use");
@@ -44,5 +44,22 @@ public class AuthService {
         } catch (AuthenticationException ex) {
             return new AuthResponse("Invalid email or password.");
         }
+    }
+
+    public UserDto getUserDto(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        String username = null;
+        String email = null;
+        if (principal instanceof com.leo.fintech.config.User user) {
+            username = user.getUsername();
+            email = user.getEmail();
+        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            email = userDetails.getUsername();
+            username = null;
+        } else if (principal instanceof String str) {
+            email = str;
+            username = null;
+        }
+        return new UserDto(username != null ? username : email, email);
     }
 }
