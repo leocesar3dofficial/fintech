@@ -50,19 +50,16 @@ public class AuthService {
 
     public UserDto getUserDto(Authentication authentication) {
         Object principal = authentication.getPrincipal();
-        String username = null;
-        String email = null;
 
         if (principal instanceof com.leo.fintech.config.User user) {
-            username = user.getUsername();
-            email = user.getEmail();
-        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
-            email = userDetails.getUsername();
-            username = null;
-        } else if (principal instanceof String str) {
-            email = str;
-            username = null;
+            return new UserDto(user.getUsername(), user.getEmail());
         }
-        return new UserDto(username != null ? username : email, email);
+
+        // fallback: UserDetails or String (username only, email unknown)
+        String fallback = principal instanceof UserDetails
+                ? ((UserDetails) principal).getUsername()
+                : principal.toString();
+
+        return new UserDto(fallback, fallback); // No way to know real email & username from just a string
     }
 }
