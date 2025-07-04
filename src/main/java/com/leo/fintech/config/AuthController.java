@@ -74,8 +74,24 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication authentication) {
-        return ResponseEntity.ok(authentication.getPrincipal());
+    public ResponseEntity<UserDto> me(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        String username = null;
+        String email = null;
+        // Try to extract username/email from known types
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            username = userDetails.getUsername();
+            // If your UserDetails has getEmail(), use it; otherwise, fallback to username
+            try {
+                email = (String) userDetails.getClass().getMethod("getEmail").invoke(userDetails);
+            } catch (Exception e) {
+                email = userDetails.getUsername();
+            }
+        } else if (principal instanceof String str) {
+            username = str;
+            email = str;
+        }
+        return ResponseEntity.ok(new UserDto(username, email));
     }
 
     @PostMapping("/logout")
