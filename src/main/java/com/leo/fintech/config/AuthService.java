@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.leo.fintech.dto.UserDto;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -50,6 +52,7 @@ public class AuthService {
         Object principal = authentication.getPrincipal();
         String username = null;
         String email = null;
+
         if (principal instanceof com.leo.fintech.config.User user) {
             username = user.getUsername();
             email = user.getEmail();

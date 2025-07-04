@@ -1,11 +1,11 @@
-package com.leo.fintech.config;
+package com.leo.fintech.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-class UserDto {
+public class UserDto {
     private String username;
     private String email;
 }
