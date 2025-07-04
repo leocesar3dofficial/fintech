@@ -17,9 +17,9 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String email) {
         return Jwts.builder()
-            .setSubject(userDetails.getUsername())
+            .setSubject(email)
             .setIssuedAt(new Date())
             .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
             .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
