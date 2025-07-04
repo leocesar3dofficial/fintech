@@ -4,12 +4,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,43 +29,16 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(errorMsg));
     }
 
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(new AuthResponse("Email already in use"));
-        }
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role("USER")
-                .build();
-
-        userRepository.save(user);
-
-        String jwt = jwtService.generateToken(user.getEmail());
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-            User user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-            String jwt = jwtService.generateToken(user.getEmail());
-            return ResponseEntity.ok(new AuthResponse(jwt));
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Invalid email or password."));
-        }
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @GetMapping("/me")
@@ -79,19 +47,19 @@ public class AuthController {
         String username = null;
         String email = null;
         // Try to extract username/email from known types
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
-            username = userDetails.getUsername();
-            // If your UserDetails has getEmail(), use it; otherwise, fallback to username
-            try {
-                email = (String) userDetails.getClass().getMethod("getEmail").invoke(userDetails);
-            } catch (Exception e) {
-                email = userDetails.getUsername();
-            }
+        if (principal instanceof com.leo.fintech.config.User user) {
+            username = user.getUsername();
+            email = user.getEmail();
+        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            email = userDetails.getUsername();
+            username = null;
+            // Try to get username from UserRepository if possible
+            // Optionally, inject UserRepository and look up by email
         } else if (principal instanceof String str) {
-            username = str;
             email = str;
+            username = null;
         }
-        return ResponseEntity.ok(new UserDto(username, email));
+        return ResponseEntity.ok(new UserDto(username != null ? username : email, email));
     }
 
     @PostMapping("/logout")
