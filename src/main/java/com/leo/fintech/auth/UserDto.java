@@ -1,4 +1,4 @@
-package com.leo.fintech.dto;
+package com.leo.fintech.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

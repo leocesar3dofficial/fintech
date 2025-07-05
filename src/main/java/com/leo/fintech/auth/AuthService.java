@@ -1,4 +1,4 @@
-package com.leo.fintech.config;
+package com.leo.fintech.auth;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.leo.fintech.dto.UserDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,7 +51,7 @@ public class AuthService {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails customUserDetails) {
-            com.leo.fintech.config.User user = customUserDetails.getUser();
+            com.leo.fintech.auth.User user = customUserDetails.getUser();
             return new UserDto(user.getUsername(), user.getEmail());
         }
 

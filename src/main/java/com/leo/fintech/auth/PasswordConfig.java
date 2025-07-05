@@ -1,4 +1,4 @@
-package com.leo.fintech.config;
+package com.leo.fintech.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
