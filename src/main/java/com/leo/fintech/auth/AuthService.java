@@ -62,4 +62,23 @@ public class AuthService {
 
         return new UserDto(fallback, fallback); // No way to know real email & username from just a string
     }
+    
+    /**
+     * Deletes the currently authenticated user from the database.
+     * @param authentication the current authentication object
+     */
+    public void deleteUser(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails customUserDetails) {
+            User user = customUserDetails.getUser();
+            userRepository.deleteById(user.getId());
+        } else if (principal instanceof UserDetails userDetails) {
+            // fallback: try to find by email/username
+            String email = userDetails.getUsername();
+            userRepository.findByEmail(email).ifPresent(user -> userRepository.deleteById(user.getId()));
+        } else if (principal instanceof String str) {
+            // fallback: try to find by string username
+            userRepository.findByEmail(str).ifPresent(user -> userRepository.deleteById(user.getId()));
+        }
+    }
 }
