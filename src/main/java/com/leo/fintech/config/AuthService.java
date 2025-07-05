@@ -52,7 +52,8 @@ public class AuthService {
     public UserDto getUserDto(Authentication authentication) {
         Object principal = authentication.getPrincipal();
 
-        if (principal instanceof com.leo.fintech.config.User user) {
+        if (principal instanceof CustomUserDetails customUserDetails) {
+            com.leo.fintech.config.User user = customUserDetails.getUser();
             return new UserDto(user.getUsername(), user.getEmail());
         }
 
