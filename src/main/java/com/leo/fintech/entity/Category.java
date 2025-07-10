@@ -1,9 +1,13 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.entity;
+
+import com.leo.fintech.auth.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,19 +15,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {@jakarta.persistence.UniqueConstraint(columnNames = "email")})
+@Table(name = "categories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String email;
-    private String password;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    private String role;
+    private String name;
+
+    private Boolean isIncome;
 }
