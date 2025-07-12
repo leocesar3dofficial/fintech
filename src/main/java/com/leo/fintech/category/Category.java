@@ -1,7 +1,4 @@
-package com.leo.fintech.entity;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
+package com.leo.fintech.category;
 
 import com.leo.fintech.auth.User;
 
@@ -20,12 +17,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "goals")
+@Table(name = "categories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Goal {
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +31,8 @@ public class Goal {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "target_amount", nullable = false, precision = 38, scale = 2)
-    private BigDecimal targetAmount;
-
-    @Column(name = "current_amount", precision = 38, scale = 2)
-    private BigDecimal currentAmount;
-
-    @Column(name = "due_date")
-    private LocalDate dueDate;
+    @Column(name = "is_income", nullable = false)
+    private Boolean isIncome;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

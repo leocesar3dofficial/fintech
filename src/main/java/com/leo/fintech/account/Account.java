@@ -1,4 +1,4 @@
-package com.leo.fintech.entity;
+package com.leo.fintech.account;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
