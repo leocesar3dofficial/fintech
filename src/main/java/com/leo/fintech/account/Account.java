@@ -43,7 +43,7 @@ public class Account {
     @Column(precision = 38, scale = 2)
     private BigDecimal balance;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDate createdAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
