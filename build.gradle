@@ -3,6 +3,7 @@ plugins {
 	id 'war'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.flywaydb.flyway' version '9.22.3'	
 }
 
 group = 'com.leo'
@@ -40,6 +41,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	implementation 'org.hibernate:hibernate-core:7.0.5.Final'
+	implementation 'org.hibernate:hibernate-tools:5.3.37.Final'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -47,4 +50,20 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Run task: ./gradlew generateJpaEntities
+task generateJpaEntities(type: JavaExec) {
+    group = 'build'
+    description = 'Generates JPA entities from the existing DB schema using Hibernate Tools.'
+
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.hibernate.tool.Main'
+
+    args = [
+        'hbm2java',
+        '-cfg', "$projectDir/src/main/resources/hibernate.cfg.xml",
+        '-reveng', "$projectDir/src/main/resources/hibernate.reveng.xml",
+        '-o', "$buildDir/generated-jpa"
+    ]
 }
