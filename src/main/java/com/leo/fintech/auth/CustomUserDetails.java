@@ -2,6 +2,7 @@ package com.leo.fintech.auth;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,10 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    public UUID getId() {
+        return this.user.getId();
+    }
+    
     public User getUser() {
         return user;
     }

@@ -3,6 +3,8 @@ package com.leo.fintech.account;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.leo.fintech.auth.User;
 
 import jakarta.persistence.Column;
@@ -43,6 +45,7 @@ public class Account {
     @Column(precision = 38, scale = 2)
     private BigDecimal balance;
 
+    @CreationTimestamp
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDate createdAt;
 

@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.auth.User;
-import com.leo.fintech.auth.UserRepository;
+import com.leo.fintech.auth.SecurityUtils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,9 +21,6 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     public List<AccountDto> getAllAccounts() {
         return accountRepository.findAll().stream()
                 .map(this::toDto)
@@ -36,18 +32,16 @@ public class AccountService {
     }
 
     public AccountDto createAccount(AccountDto dto) {
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Account account = Account.builder()
                 .name(dto.getName())
                 .type(dto.getType())
                 .institution(dto.getInstitution())
-                .user(user)
+                .user(SecurityUtils.getCurrentUser())
                 .build();
+
         Account saved = accountRepository.save(account);
-        accountRepository.flush();
         return toDto(saved);
-    }
+    }   
 
     public Optional<AccountDto> updateAccount(Long id, AccountDto dto) {
         return accountRepository.findById(id).map(account -> {
