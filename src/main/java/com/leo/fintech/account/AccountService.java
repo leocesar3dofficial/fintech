@@ -9,14 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.leo.fintech.auth.SecurityUtils;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 @Service
 public class AccountService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     private AccountRepository accountRepository;
