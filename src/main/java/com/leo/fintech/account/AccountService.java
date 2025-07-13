@@ -48,9 +48,6 @@ public class AccountService {
             account.setName(dto.getName());
             account.setType(dto.getType());
             account.setInstitution(dto.getInstitution());
-            account.setBalance(dto.getBalance());
-            account.setCreatedAt(dto.getCreatedAt());
-            // User update omitted for simplicity
             return toDto(accountRepository.save(account));
         });
     }
@@ -61,13 +58,9 @@ public class AccountService {
 
     private AccountDto toDto(Account account) {
         return AccountDto.builder()
-                .id(account.getId())
                 .name(account.getName())
                 .type(account.getType())
                 .institution(account.getInstitution())
-                .balance(account.getBalance())
-                .createdAt(account.getCreatedAt())
-                .userId(account.getUser().getId())
                 .build();
     }
 }

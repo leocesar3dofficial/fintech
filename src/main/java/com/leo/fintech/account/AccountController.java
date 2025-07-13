@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
@@ -27,13 +29,13 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<AccountDto> createAccount(@RequestBody AccountDto dto) {
+    public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto) {
         AccountDto created = accountService.createAccount(dto);
         return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @RequestBody AccountDto dto) {
+    public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto dto) {
         Optional<AccountDto> updated = accountService.updateAccount(id, dto);
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

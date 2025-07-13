@@ -1,4 +1,5 @@
 package com.leo.fintech.auth;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -7,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.leo.fintech.exception.EmailAlreadyExistsException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,8 +23,9 @@ public class AuthService {
     
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return new AuthResponse("Email already in use");
+            throw new EmailAlreadyExistsException(request.getEmail());
         }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -29,6 +33,7 @@ public class AuthService {
                 .role("USER")
                 .build();
         userRepository.save(user);
+        
         String jwt = jwtService.generateToken(user.getEmail());
         return new AuthResponse(jwt);
     }
