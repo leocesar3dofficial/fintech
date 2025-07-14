@@ -1,5 +1,6 @@
 package com.leo.fintech.auth;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -40,4 +41,10 @@ public class User {
 
     @Column(length = 255)
     private String username;
+
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false, updatable = false, insertable = false)
+    private OffsetDateTime updatedAt;
 }
