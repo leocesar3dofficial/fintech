@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -44,12 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String role = jwtService.extractRole(jwt);
             if (role != null && !jwtService.isTokenExpired(jwt)) {
-                // Create authorities from role
+                // Load user details and set as principal
+                var userDetails = customUserDetailsService.loadUserByUsername(username);
                 var authorities = java.util.Collections.singletonList(
                     (org.springframework.security.core.GrantedAuthority) () -> "ROLE_" + role
                 );
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities
+                        userDetails, null, authorities
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
