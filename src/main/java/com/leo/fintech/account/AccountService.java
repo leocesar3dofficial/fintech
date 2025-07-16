@@ -15,6 +15,9 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private com.leo.fintech.auth.UserRepository userRepository;
+
     public List<AccountDto> getAllAccounts() {
         return accountRepository.findAll().stream()
                 .map(this::toDto)
@@ -26,11 +29,23 @@ public class AccountService {
     }
 
     public AccountDto createAccount(AccountDto dto) {
+        Object principal = SecurityUtils.getCurrentUserPrincipal();
+        final String userId;
+        if (principal instanceof com.leo.fintech.auth.JwtUserPrincipal jwtPrincipal) {
+            userId = jwtPrincipal.getUserId();
+        } else if (principal instanceof com.leo.fintech.auth.User user) {
+            userId = user.getId().toString();
+        } else {
+            throw new IllegalStateException("Unknown principal type for account creation");
+        }
+        final java.util.UUID uuid = java.util.UUID.fromString(userId);
+        final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
         Account account = Account.builder()
                 .name(dto.getName())
                 .type(dto.getType())
                 .institution(dto.getInstitution())
-                .user(SecurityUtils.getCurrentUser())
+                .user(userEntity)
                 .build();
 
         Account saved = accountRepository.save(account);

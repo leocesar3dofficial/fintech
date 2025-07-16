@@ -8,11 +8,17 @@ public class SecurityUtils {
     // This class provides utility methods related to security and authentication
     private SecurityUtils() {}
 
-    public static User getCurrentUser() {
+    public static Object getCurrentUserPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails)) {
+        if (auth == null) {
             throw new IllegalStateException("No authenticated user found");
         }
-        return ((CustomUserDetails) auth.getPrincipal()).getUser();
+        Object principal = auth.getPrincipal();
+        if (principal instanceof JwtUserPrincipal) {
+            return principal;
+        } else if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getUser();
+        }
+        throw new IllegalStateException("Unknown principal type: " + principal.getClass());
     }
 }

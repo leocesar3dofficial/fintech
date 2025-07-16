@@ -17,9 +17,11 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String userId, String email, String username, String role) {
         return Jwts.builder()
-            .setSubject(email)
+            .setSubject(userId)
+            .claim("email", email)
+            .claim("username", username)
             .claim("role", role)
             .setIssuedAt(new Date())
             .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
@@ -35,7 +37,7 @@ public class JwtService {
             .get("role", String.class);
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(SECRET_KEY.getBytes())
             .build()
@@ -43,6 +45,26 @@ public class JwtService {
             .getBody()
             .getSubject();
     }
+
+    public String extractEmail(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(SECRET_KEY.getBytes())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("email", String.class);
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(SECRET_KEY.getBytes())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("username", String.class);
+    }
+
+    // Removed duplicate extractUsername method
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);

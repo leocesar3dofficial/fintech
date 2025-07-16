@@ -32,26 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String username;
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
+        String userId = jwtService.extractUserId(jwt);
+        String email = jwtService.extractEmail(jwt);
+        String username = jwtService.extractUsername(jwt);
+        String role = jwtService.extractRole(jwt);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String role = jwtService.extractRole(jwt);
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (role != null && !jwtService.isTokenExpired(jwt)) {
-                // Load user details and set as principal
-                var userDetails = customUserDetailsService.loadUserByUsername(username);
+                // Inject user info from token into a lightweight principal
+                JwtUserPrincipal principal = new JwtUserPrincipal(userId, email, username, role);
                 var authorities = java.util.Collections.singletonList(
                     (org.springframework.security.core.GrantedAuthority) () -> "ROLE_" + role
                 );
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, authorities
+                        principal, null, authorities
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
