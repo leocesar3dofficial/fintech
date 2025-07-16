@@ -1,13 +1,22 @@
 package com.leo.fintech.account;
 
+import java.security.Principal;
+import org.springframework.security.core.Authentication;
 import java.util.List;
 import java.util.Optional;
-import java.security.Principal;
-// ...existing code...
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.leo.fintech.auth.JwtUserPrincipal;
 
 import jakarta.validation.Valid;
 
@@ -21,12 +30,19 @@ public class AccountController {
     @GetMapping
     public List<AccountDto> getAllAccounts(Principal principal) {
         // Only return accounts belonging to the logged-in user
-        return accountService.getAccountsByUser(principal.getName());
+        Authentication authentication = (Authentication) principal;
+        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
+        String userId = userPrincipal.getUserId();
+        System.out.println("Fetching accounts for user: " + userId);
+        return accountService.getAccountsByUser(userId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id, Principal principal) {
-        Optional<AccountDto> account = accountService.getAccountByIdAndUser(id, principal.getName());
+        Authentication authentication = (Authentication) principal;
+        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
+        String userId = userPrincipal.getUserId();
+        Optional<AccountDto> account = accountService.getAccountByIdAndUser(id, userId);
         return account.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -34,7 +50,10 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto, Principal principal) {
         // Create account for the logged-in user only
-        AccountDto created = accountService.createAccountForUser(dto, principal.getName());
+        Authentication authentication = (Authentication) principal;
+        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
+        String userId = userPrincipal.getUserId();
+        AccountDto created = accountService.createAccountForUser(dto, userId);
         return ResponseEntity.ok(created);
     }
 
@@ -42,7 +61,10 @@ public class AccountController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id, Principal principal) {
         // Only allow deletion if the account belongs to the logged-in user
-        boolean deleted = accountService.deleteAccountByUser(id, principal.getName());
+        Authentication authentication = (Authentication) principal;
+        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
+        String userId = userPrincipal.getUserId();
+        boolean deleted = accountService.deleteAccountByUser(id, userId);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
@@ -51,7 +73,10 @@ public class AccountController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto dto, Principal principal) {
-        Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto, principal.getName());
+        Authentication authentication = (Authentication) principal;
+        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
+        String userId = userPrincipal.getUserId();
+        Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto, userId);
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
