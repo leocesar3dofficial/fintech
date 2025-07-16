@@ -1,13 +1,14 @@
+
 package com.leo.fintech.account;
 
 import java.util.List;
 import java.util.Optional;
+// ...existing code...
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.auth.SecurityUtils;
 
 @Service
 public class AccountService {
@@ -18,27 +19,23 @@ public class AccountService {
     @Autowired
     private com.leo.fintech.auth.UserRepository userRepository;
 
-    public List<AccountDto> getAllAccounts() {
-        return accountRepository.findAll().stream()
+
+    public List<AccountDto> getAccountsByUser(String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return accountRepository.findAllByUserId(uuid).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<AccountDto> getAccountById(Long id) {
-        return accountRepository.findById(id).map(this::toDto);
+
+    public Optional<AccountDto> getAccountByIdAndUser(Long id, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return accountRepository.findByIdAndUserId(id, uuid).map(this::toDto);
     }
 
-    public AccountDto createAccount(AccountDto dto) {
-        Object principal = SecurityUtils.getCurrentUserPrincipal();
-        final String userId;
-        if (principal instanceof com.leo.fintech.auth.JwtUserPrincipal jwtPrincipal) {
-            userId = jwtPrincipal.getUserId();
-        } else if (principal instanceof com.leo.fintech.auth.User user) {
-            userId = user.getId().toString();
-        } else {
-            throw new IllegalStateException("Unknown principal type for account creation");
-        }
-        final java.util.UUID uuid = java.util.UUID.fromString(userId);
+
+    public AccountDto createAccountForUser(AccountDto dto, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
         final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
             .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
         Account account = Account.builder()
@@ -47,13 +44,16 @@ public class AccountService {
                 .institution(dto.getInstitution())
                 .user(userEntity)
                 .build();
-
         Account saved = accountRepository.save(account);
         return toDto(saved);
-    }   
+    }
 
-    public Optional<AccountDto> updateAccount(Long id, AccountDto dto) {
-        return accountRepository.findById(id).map(account -> {
+
+
+
+    public Optional<AccountDto> updateAccountByUser(Long id, AccountDto dto, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return accountRepository.findByIdAndUserId(id, uuid).map(account -> {
             account.setName(dto.getName());
             account.setType(dto.getType());
             account.setInstitution(dto.getInstitution());
@@ -61,8 +61,14 @@ public class AccountService {
         });
     }
 
-    public void deleteAccount(Long id) {
-        accountRepository.deleteById(id);
+    public boolean deleteAccountByUser(Long id, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        Optional<Account> accountOpt = accountRepository.findByIdAndUserId(id, uuid);
+        if (accountOpt.isPresent()) {
+            accountRepository.deleteByIdAndUserId(id, uuid);
+            return true;
+        }
+        return false;
     }
 
     private AccountDto toDto(Account account) {
