@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 @Builder
 public class AccountDto {
+    private Long id;
+
     @NotBlank(message = "Name is required")
     @Size(min = 5, message = "Name must have at least 5 characters")
     private String name;

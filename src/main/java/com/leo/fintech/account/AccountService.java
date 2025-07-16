@@ -73,6 +73,7 @@ public class AccountService {
 
     private AccountDto toDto(Account account) {
         return AccountDto.builder()
+                .id(account.getId())
                 .name(account.getName())
                 .type(account.getType())
                 .institution(account.getInstitution())
