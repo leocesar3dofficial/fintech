@@ -5,43 +5,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final com.leo.fintech.auth.UserRepository userRepository;
+    private final AccountMapper accountMapper;
 
-    @Autowired
-    private com.leo.fintech.auth.UserRepository userRepository;
+    public AccountService(AccountRepository accountRepository,
+                          com.leo.fintech.auth.UserRepository userRepository,
+                          AccountMapper accountMapper) {
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.accountMapper = accountMapper;
+    }
 
     public List<AccountDto> getAccountsByUser(String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
         return accountRepository.findAllByUserId(uuid).stream()
-                .map(this::toDto)
+                .map(accountMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public Optional<AccountDto> getAccountByIdAndUser(Long id, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
-        return accountRepository.findByIdAndUserId(id, uuid).map(this::toDto);
+        return accountRepository.findByIdAndUserId(id, uuid)
+                .map(accountMapper::toDto);
     }
 
     public AccountDto createAccountForUser(AccountDto dto, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
         final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
             .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
-        Account account = Account.builder()
-                .name(dto.getName())
-                .type(dto.getType())
-                .institution(dto.getInstitution())
-                .user(userEntity)
-                .build();
-        Account saved = accountRepository.save(account);
-        return toDto(saved);
+        Account account = accountMapper.toEntity(dto);
+        account.setUser(userEntity);
+        return accountMapper.toDto(accountRepository.save(account));
     }
 
     public Optional<AccountDto> updateAccountByUser(Long id, AccountDto dto, String userId) {
@@ -50,26 +52,16 @@ public class AccountService {
             account.setName(dto.getName());
             account.setType(dto.getType());
             account.setInstitution(dto.getInstitution());
-            return toDto(accountRepository.save(account));
+            return accountMapper.toDto(accountRepository.save(account));
         });
     }
 
     public boolean deleteAccountByUser(Long id, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
-        Optional<Account> accountOpt = accountRepository.findByIdAndUserId(id, uuid);
-        if (accountOpt.isPresent()) {
-            accountRepository.deleteByIdAndUserId(id, uuid);
-            return true;
-        }
-        return false;
-    }
-
-    private AccountDto toDto(Account account) {
-        return AccountDto.builder()
-                .id(account.getId())
-                .name(account.getName())
-                .type(account.getType())
-                .institution(account.getInstitution())
-                .build();
+        return accountRepository.findByIdAndUserId(id, uuid)
+                .map(_ -> {
+                    accountRepository.deleteByIdAndUserId(id, uuid);
+                    return true;
+                }).orElse(false);
     }
 }

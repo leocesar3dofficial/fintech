@@ -1,5 +1,8 @@
 package com.leo.fintech.account;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -21,4 +24,10 @@ public class AccountDto {
     @NotBlank(message = "Institution is required")
     @Size(min = 3, message = "Institution must have at least 3 characters")
     private String institution;
+
+    private BigDecimal balance;
+
+    private LocalDate createdAt;
+
+    private UUID userId;
 }
