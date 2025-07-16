@@ -3,7 +3,6 @@ package com.leo.fintech.account;
 
 import java.util.List;
 import java.util.Optional;
-// ...existing code...
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ public class AccountService {
     @Autowired
     private com.leo.fintech.auth.UserRepository userRepository;
 
-
     public List<AccountDto> getAccountsByUser(String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
         return accountRepository.findAllByUserId(uuid).stream()
@@ -27,12 +25,10 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-
     public Optional<AccountDto> getAccountByIdAndUser(Long id, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
         return accountRepository.findByIdAndUserId(id, uuid).map(this::toDto);
     }
-
 
     public AccountDto createAccountForUser(AccountDto dto, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
@@ -47,9 +43,6 @@ public class AccountService {
         Account saved = accountRepository.save(account);
         return toDto(saved);
     }
-
-
-
 
     public Optional<AccountDto> updateAccountByUser(Long id, AccountDto dto, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
