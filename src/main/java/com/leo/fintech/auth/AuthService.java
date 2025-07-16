@@ -33,8 +33,8 @@ public class AuthService {
                 .role("USER")
                 .build();
         userRepository.save(user);
-        
-        String jwt = jwtService.generateToken(user.getEmail());
+
+        String jwt = jwtService.generateToken(user.getEmail(), user.getRole());
         return new AuthResponse(jwt);
     }
 
@@ -45,7 +45,7 @@ public class AuthService {
             );
             User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String jwt = jwtService.generateToken(user.getEmail());
+            String jwt = jwtService.generateToken(user.getEmail(), user.getRole());
             return new AuthResponse(jwt);
         } catch (AuthenticationException ex) {
             return new AuthResponse("Invalid email or password.");

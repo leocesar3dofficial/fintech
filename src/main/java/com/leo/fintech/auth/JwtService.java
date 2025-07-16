@@ -17,13 +17,22 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
         return Jwts.builder()
             .setSubject(email)
+            .claim("role", role)
             .setIssuedAt(new Date())
             .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
             .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
             .compact();
+    }
+    public String extractRole(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(SECRET_KEY.getBytes())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("role", String.class);
     }
 
     public String extractUsername(String token) {
@@ -40,7 +49,7 @@ public class JwtService {
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(SECRET_KEY.getBytes())
             .build()
