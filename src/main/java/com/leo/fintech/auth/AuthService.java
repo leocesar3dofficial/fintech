@@ -68,6 +68,8 @@ public class AuthService {
         if (principal instanceof CustomUserDetails customUserDetails) {
             com.leo.fintech.auth.User user = customUserDetails.getUser();
             return new UserDto(user.getUsername(), user.getEmail());
+        } else if (principal instanceof JwtUserPrincipal jwtUserPrincipal) {
+            return new UserDto(jwtUserPrincipal.getUsername(), jwtUserPrincipal.getEmail());
         }
 
         // fallback: UserDetails or String (username only, email unknown)
