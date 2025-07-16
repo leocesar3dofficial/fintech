@@ -35,7 +35,7 @@ public class SecurityConfig {
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .httpBasic(Customizer.withDefaults()); // Or configure JWT filter here
+            .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 

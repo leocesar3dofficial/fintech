@@ -1,7 +1,6 @@
 package com.leo.fintech.account;
 
 import java.security.Principal;
-import org.springframework.security.core.Authentication;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.leo.fintech.auth.JwtUserPrincipal;
+import com.leo.fintech.auth.SecurityUtils;
 
 import jakarta.validation.Valid;
 
@@ -27,43 +26,32 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+
     @GetMapping
     public List<AccountDto> getAllAccounts(Principal principal) {
-        // Only return accounts belonging to the logged-in user
-        Authentication authentication = (Authentication) principal;
-        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
-        String userId = userPrincipal.getUserId();
-        System.out.println("Fetching accounts for user: " + userId);
+        String userId = SecurityUtils.extractUserId();
         return accountService.getAccountsByUser(userId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id, Principal principal) {
-        Authentication authentication = (Authentication) principal;
-        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
-        String userId = userPrincipal.getUserId();
+        String userId = SecurityUtils.extractUserId();
         Optional<AccountDto> account = accountService.getAccountByIdAndUser(id, userId);
         return account.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
     @PostMapping
     public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto, Principal principal) {
-        // Create account for the logged-in user only
-        Authentication authentication = (Authentication) principal;
-        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
-        String userId = userPrincipal.getUserId();
+        String userId = SecurityUtils.extractUserId();
         AccountDto created = accountService.createAccountForUser(dto, userId);
         return ResponseEntity.ok(created);
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id, Principal principal) {
-        // Only allow deletion if the account belongs to the logged-in user
-        Authentication authentication = (Authentication) principal;
-        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
-        String userId = userPrincipal.getUserId();
+        String userId = SecurityUtils.extractUserId();
         boolean deleted = accountService.deleteAccountByUser(id, userId);
         if (deleted) {
             return ResponseEntity.noContent().build();
@@ -71,11 +59,10 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
+    
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto dto, Principal principal) {
-        Authentication authentication = (Authentication) principal;
-        JwtUserPrincipal userPrincipal = (JwtUserPrincipal) authentication.getPrincipal();
-        String userId = userPrincipal.getUserId();
+        String userId = SecurityUtils.extractUserId();
         Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto, userId);
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

@@ -47,12 +47,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.getUserDto(authentication));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        // Em JWT, não há logout server-side real sem token blacklist.
-        return ResponseEntity.ok("Logout realizado (invalidate token client-side).");
-    }
-
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(Authentication authentication) {
         authService.deleteUser(authentication);

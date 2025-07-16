@@ -8,6 +8,22 @@ public class SecurityUtils {
     // This class provides utility methods related to security and authentication
     private SecurityUtils() {}
 
+    /**
+     * Extracts the userId from the current authenticated principal.
+     * Throws IllegalArgumentException if the principal is not a JwtUserPrincipal.
+     */
+    public static String extractUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+        Object userPrincipal = authentication.getPrincipal();
+        if (userPrincipal instanceof JwtUserPrincipal jwtUserPrincipal) {
+            return jwtUserPrincipal.getUserId();
+        }
+        throw new IllegalArgumentException("Invalid principal type: " + (userPrincipal != null ? userPrincipal.getClass() : "null"));
+    }
+    
     public static Object getCurrentUserPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
