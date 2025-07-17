@@ -34,7 +34,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long id, Principal principal) {
         String userId = SecurityUtils.extractUserId();
         Optional<AccountDto> account = accountService.getAccountByIdAndUser(id, userId);
         return account.map(ResponseEntity::ok)
@@ -50,7 +50,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<Void> deleteAccount(@PathVariable("id") Long id, Principal principal) {
         String userId = SecurityUtils.extractUserId();
         boolean deleted = accountService.deleteAccountByUser(id, userId);
         if (deleted) {
@@ -61,7 +61,7 @@ public class AccountController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto dto, Principal principal) {
+    public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long id, @Valid @RequestBody AccountDto dto, Principal principal) {
         String userId = SecurityUtils.extractUserId();
         Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto, userId);
         return updated.map(ResponseEntity::ok)
