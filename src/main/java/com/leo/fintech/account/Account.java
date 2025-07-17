@@ -43,8 +43,9 @@ public class Account {
     @Column(length = 255)
     private String institution;
 
-    @Column(precision = 38, scale = 2)
-    private BigDecimal balance;
+    @Column(precision = 38, scale = 2, nullable = false)
+    @Builder.Default
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @CreationTimestamp
     @Column(name = "created_at", insertable = false, updatable = false)

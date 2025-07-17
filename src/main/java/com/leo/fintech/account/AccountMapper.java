@@ -11,5 +11,6 @@ public interface AccountMapper {
 
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(target = "balance", ignore = true)
     Account toEntity(AccountDto dto);
 }
