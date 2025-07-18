@@ -55,8 +55,12 @@ public class CategoryService {
         });
     }
 
-    public void deleteCategoryByUser(Long id, String userId) {
+    public Boolean deleteCategoryByUser(Long id, String userId) {
         java.util.UUID uuid = java.util.UUID.fromString(userId);
-        categoryRepository.findByIdAndUserId(id, uuid).ifPresent(categoryRepository::delete);
+        return categoryRepository.findByIdAndUserId(id, uuid)
+                .map(_ -> {
+                    categoryRepository.deleteByIdAndUserId(id, uuid);
+                    return true;
+                }).orElse(false);
     }
 }
