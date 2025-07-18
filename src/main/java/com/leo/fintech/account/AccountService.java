@@ -5,20 +5,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 import org.springframework.stereotype.Service;
 
+import com.leo.fintech.auth.UserRepository;
 
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final com.leo.fintech.auth.UserRepository userRepository;
     private final AccountMapper accountMapper;
+    private final UserRepository userRepository;
 
-    public AccountService(AccountRepository accountRepository,
-                          com.leo.fintech.auth.UserRepository userRepository,
-                          AccountMapper accountMapper) {
+    public AccountService(
+        AccountRepository accountRepository,
+        AccountMapper accountMapper,                      
+        UserRepository userRepository
+        ) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.accountMapper = accountMapper;

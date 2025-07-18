@@ -1,0 +1,62 @@
+package com.leo.fintech.category;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.leo.fintech.auth.UserRepository;
+
+@Service
+public class CategoryService {
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final UserRepository userRepository;
+
+    public CategoryService(
+        CategoryRepository categoryRepository,
+        CategoryMapper categoryMapper,
+        UserRepository userRepository
+        ) {
+        this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
+        this.userRepository = userRepository;
+    }
+
+    public List<CategoryDto> getCategoriesByUser(String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return categoryRepository.findAllByUserId(uuid).stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<CategoryDto> getCategoryByIdAndUser(Long id, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return categoryRepository.findByIdAndUserId(id, uuid)
+                .map(categoryMapper::toDto);
+    }
+
+    public CategoryDto createCategoryForUser(CategoryDto dto, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
+        Category category = categoryMapper.toEntity(dto);
+        category.setUser(userEntity);
+        return categoryMapper.toDto(categoryRepository.save(category));
+    }
+
+    public Optional<CategoryDto> updateCategoryByUser(Long id, CategoryDto dto, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        return categoryRepository.findByIdAndUserId(id, uuid).map(category -> {
+            category.setName(dto.getName());
+            category.setIsIncome(dto.getIsIncome());
+            return categoryMapper.toDto(categoryRepository.save(category));
+        });
+    }
+
+    public void deleteCategoryByUser(Long id, String userId) {
+        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        categoryRepository.findByIdAndUserId(id, uuid).ifPresent(categoryRepository::delete);
+    }
+}
