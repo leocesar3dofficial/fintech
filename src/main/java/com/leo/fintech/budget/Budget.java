@@ -6,8 +6,10 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
+import com.leo.fintech.converter.YearMonthDateAttributeConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +39,7 @@ public class Budget {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    @Convert(converter = YearMonthDateAttributeConverter.class)
     private LocalDate month;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
