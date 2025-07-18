@@ -10,6 +10,9 @@ import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.leo.fintech.account.Account;
+import com.leo.fintech.budget.Budget;
+import com.leo.fintech.category.Category;
+import com.leo.fintech.goal.Goal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,6 +64,21 @@ public class User {
     @Cascade(CascadeType.ALL)
     @JsonManagedReference
     private final List<Account> accounts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonManagedReference
+    private final List<Category> categories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonManagedReference
+    private final List<Budget> budgets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonManagedReference
+    private final List<Goal> goals = new ArrayList<>();
 
     public void addAccount(Account account) {
         accounts.add(account);

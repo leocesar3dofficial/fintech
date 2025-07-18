@@ -3,7 +3,9 @@ package com.leo.fintech.transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.account.Account;
+import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
 
 import jakarta.persistence.Column;
@@ -48,6 +50,7 @@ public class Transaction {
     
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
+    @JsonBackReference
     private Account account;
     
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

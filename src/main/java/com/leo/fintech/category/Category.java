@@ -1,5 +1,6 @@
 package com.leo.fintech.category;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
 
 import jakarta.persistence.Column;
@@ -36,5 +37,6 @@ public class Category {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 }

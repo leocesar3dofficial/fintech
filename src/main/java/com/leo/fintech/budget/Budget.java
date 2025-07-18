@@ -3,6 +3,7 @@ package com.leo.fintech.budget;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
 
@@ -44,5 +45,6 @@ public class Budget {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 }

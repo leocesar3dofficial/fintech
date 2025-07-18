@@ -3,6 +3,7 @@ package com.leo.fintech.goal;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
 
 import jakarta.persistence.Column;
@@ -45,5 +46,6 @@ public class Goal {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 }

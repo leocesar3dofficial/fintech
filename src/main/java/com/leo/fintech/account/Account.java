@@ -2,11 +2,17 @@ package com.leo.fintech.account;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.leo.fintech.auth.User;
+import com.leo.fintech.transaction.Transaction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,4 +62,9 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
+
+    @OneToMany(mappedBy = "account", orphanRemoval = true)
+    @Cascade(CascadeType.ALL)
+    @JsonManagedReference
+    private final List<Transaction> transactions = new ArrayList<>();
 }
