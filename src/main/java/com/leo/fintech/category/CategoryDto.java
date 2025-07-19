@@ -3,6 +3,7 @@ package com.leo.fintech.category;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,7 @@ public class CategoryDto {
     @Size(min = 5, message = "Name must have at least 5 characters")
     private String name;
 
-    @NotBlank(message = "Is income is required")
-    @Size(min = 1, message = "Is income must be true or false")
+    @NotNull(message = "Is income is required")
     private Boolean isIncome;
 
     private UUID userId;

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.leo.fintech.exception.EmailAlreadyExistsException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -80,10 +81,7 @@ public class AuthService {
         return new UserDto(fallback, fallback); // No way to know real email & username from just a string
     }
     
-    /**
-     * Deletes the currently authenticated user from the database.
-     * @param authentication the current authentication object
-     */
+    @Transactional
     public void deleteUser(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails customUserDetails) {

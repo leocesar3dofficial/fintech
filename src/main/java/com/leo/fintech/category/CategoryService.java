@@ -2,9 +2,11 @@ package com.leo.fintech.category;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.leo.fintech.auth.UserRepository;
 
@@ -25,20 +27,20 @@ public class CategoryService {
     }
 
     public List<CategoryDto> getCategoriesByUser(String userId) {
-        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        UUID uuid = UUID.fromString(userId);
         return categoryRepository.findAllByUserId(uuid).stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public Optional<CategoryDto> getCategoryByIdAndUser(Long id, String userId) {
-        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        UUID uuid = UUID.fromString(userId);
         return categoryRepository.findByIdAndUserId(id, uuid)
                 .map(categoryMapper::toDto);
     }
 
     public CategoryDto createCategoryForUser(CategoryDto dto, String userId) {
-        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        UUID uuid = UUID.fromString(userId);
         final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
             .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
         Category category = categoryMapper.toEntity(dto);
@@ -46,8 +48,9 @@ public class CategoryService {
         return categoryMapper.toDto(categoryRepository.save(category));
     }
 
+    @Transactional
     public Optional<CategoryDto> updateCategoryByUser(Long id, CategoryDto dto, String userId) {
-        java.util.UUID uuid = java.util.UUID.fromString(userId);
+        UUID uuid = UUID.fromString(userId);
         return categoryRepository.findByIdAndUserId(id, uuid).map(category -> {
             category.setName(dto.getName());
             category.setIsIncome(dto.getIsIncome());
@@ -55,12 +58,14 @@ public class CategoryService {
         });
     }
 
+    @Transactional
     public Boolean deleteCategoryByUser(Long id, String userId) {
-        java.util.UUID uuid = java.util.UUID.fromString(userId);
-        return categoryRepository.findByIdAndUserId(id, uuid)
-                .map(_ -> {
-                    categoryRepository.deleteByIdAndUserId(id, uuid);
-                    return true;
-                }).orElse(false);
+        UUID uuid = UUID.fromString(userId);
+        Optional<Category> category = categoryRepository.findByIdAndUserId(id, uuid);
+        if (category.isPresent()) {
+            categoryRepository.deleteByIdAndUserId(id, uuid);
+            return true;
+        }
+        return false;
     }
 }

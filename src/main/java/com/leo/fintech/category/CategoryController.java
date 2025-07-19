@@ -55,7 +55,8 @@ public class CategoryController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();       
-        }   }
+        }
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long id, @Valid @RequestBody CategoryDto dto, Principal principal) {
