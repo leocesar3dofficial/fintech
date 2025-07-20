@@ -1,12 +1,15 @@
 package com.leo.fintech.goal;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
+import com.leo.fintech.category.Category;
+import com.leo.fintech.converter.YearMonthAttributeConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,14 +38,19 @@ public class Goal {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "target_amount", nullable = false, precision = 38, scale = 2)
+    @Column(name = "target_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal targetAmount;
 
-    @Column(name = "current_amount", precision = 38, scale = 2)
+    @Column(name = "current_amount", precision = 10, scale = 2)
     private BigDecimal currentAmount;
 
-    @Column(name = "due_date")
-    private LocalDate dueDate;
+    @Column(name = "due_month")
+    @Convert(converter = YearMonthAttributeConverter.class)
+    private YearMonth dueMonth;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

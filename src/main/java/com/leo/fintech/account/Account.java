@@ -50,7 +50,7 @@ public class Account {
     @Column(length = 255)
     private String institution;
 
-    @Column(precision = 38, scale = 2, nullable = false)
+    @Column(precision = 10, scale = 2, nullable = false)
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 

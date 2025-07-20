@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.leo.fintech.auth.SecurityUtils;
+import com.leo.fintech.auth.User;
 import com.leo.fintech.auth.UserRepository;
 
 @Service
@@ -26,32 +28,36 @@ public class CategoryService {
         this.userRepository = userRepository;
     }
 
-    public List<CategoryDto> getCategoriesByUser(String userId) {
-        UUID uuid = UUID.fromString(userId);
-        return categoryRepository.findAllByUserId(uuid).stream()
+    public List<CategoryDto> getCategoriesByUser() {
+        UUID userId = SecurityUtils.extractUserId();
+
+        return categoryRepository.findAllByUserId(userId).stream()
                 .map(categoryMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<CategoryDto> getCategoryByIdAndUser(Long id, String userId) {
-        UUID uuid = UUID.fromString(userId);
-        return categoryRepository.findByIdAndUserId(id, uuid)
+    public Optional<CategoryDto> getCategoryByIdAndUser(Long id) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        return categoryRepository.findByIdAndUserId(id, userId)
                 .map(categoryMapper::toDto);
     }
 
-    public CategoryDto createCategoryForUser(CategoryDto dto, String userId) {
-        UUID uuid = UUID.fromString(userId);
-        final com.leo.fintech.auth.User userEntity = userRepository.findById(uuid)
-            .orElseThrow(() -> new IllegalStateException("User not found for id: " + userId));
+    public CategoryDto createCategoryForUser(CategoryDto dto) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        final User userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalStateException("User not found"));
         Category category = categoryMapper.toEntity(dto);
         category.setUser(userEntity);
         return categoryMapper.toDto(categoryRepository.save(category));
     }
 
     @Transactional
-    public Optional<CategoryDto> updateCategoryByUser(Long id, CategoryDto dto, String userId) {
-        UUID uuid = UUID.fromString(userId);
-        return categoryRepository.findByIdAndUserId(id, uuid).map(category -> {
+    public Optional<CategoryDto> updateCategoryByUser(Long id, CategoryDto dto) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        return categoryRepository.findByIdAndUserId(id, userId).map(category -> {
             category.setName(dto.getName());
             category.setIsIncome(dto.getIsIncome());
             return categoryMapper.toDto(categoryRepository.save(category));
@@ -59,13 +65,15 @@ public class CategoryService {
     }
 
     @Transactional
-    public Boolean deleteCategoryByUser(Long id, String userId) {
-        UUID uuid = UUID.fromString(userId);
-        Optional<Category> category = categoryRepository.findByIdAndUserId(id, uuid);
+    public Boolean deleteCategoryByUser(Long id) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        Optional<Category> category = categoryRepository.findByIdAndUserId(id, userId);
         if (category.isPresent()) {
-            categoryRepository.deleteByIdAndUserId(id, uuid);
+            categoryRepository.deleteByIdAndUserId(id, userId);
             return true;
         }
+        
         return false;
     }
 }

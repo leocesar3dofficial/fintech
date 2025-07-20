@@ -3,10 +3,13 @@ package com.leo.fintech.budget;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
+import com.leo.fintech.converter.YearMonthAttributeConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,15 +20,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "budgets")
-@Getter
-@Setter
+@Data
 @ToString(exclude = {"category", "user"})
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,6 +41,7 @@ public class Budget {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    @Convert(converter = YearMonthAttributeConverter.class)
     private YearMonth month;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -48,5 +50,6 @@ public class Budget {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 }
