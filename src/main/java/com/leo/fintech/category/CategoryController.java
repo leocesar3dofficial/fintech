@@ -1,6 +1,5 @@
 package com.leo.fintech.category;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getAllCategories(Principal principal) {
+    public List<CategoryDto> getAllCategories() {
         return categoryService.getCategoriesByUser();
     }
 
