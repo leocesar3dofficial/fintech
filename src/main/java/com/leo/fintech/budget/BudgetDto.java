@@ -2,8 +2,6 @@ package com.leo.fintech.budget;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import com.leo.fintech.category.Category;
-import java.util.UUID;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
