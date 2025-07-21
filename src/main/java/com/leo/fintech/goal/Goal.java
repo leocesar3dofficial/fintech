@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.YearMonth;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.leo.fintech.account.Account;
 import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.converter.YearMonthAttributeConverter;
@@ -51,6 +52,10 @@ public class Goal {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

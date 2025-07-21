@@ -63,6 +63,7 @@ CREATE TABLE goals (
     target_amount NUMERIC(10,2) NOT NULL,
     current_amount NUMERIC(10,2) DEFAULT 0,
     due_month VARCHAR(7) NOT NULL,
+    account_id BIGINT NOT NULL,
     category_id BIGINT NOT NULL,
     user_id UUID NOT NULL
 );
@@ -90,6 +91,7 @@ ALTER TABLE categories
     ADD CONSTRAINT fk_categories_user FOREIGN KEY (user_id) REFERENCES users;
 
 ALTER TABLE goals
+    ADD CONSTRAINT fk_goals_account FOREIGN KEY (account_id) REFERENCES accounts,
     ADD CONSTRAINT fk_goals_user FOREIGN KEY (user_id) REFERENCES users;
 
 ALTER TABLE transactions
@@ -101,4 +103,6 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_categories_user_id ON categories(user_id);
 CREATE INDEX idx_accounts_user_id ON accounts(user_id);
 CREATE INDEX idx_budgets_user_id ON budgets(user_id);
+
+CREATE INDEX idx_goals_user_id ON goals(user_id);
 CREATE INDEX idx_transactions_account_id ON transactions(account_id);
