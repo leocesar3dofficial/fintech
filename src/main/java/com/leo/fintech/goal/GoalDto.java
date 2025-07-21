@@ -6,7 +6,9 @@ import java.time.YearMonth;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +22,8 @@ public class GoalDto {
     
     private Long id;
     
+    @NotBlank(message = "Name is required")
+    @Size(min = 5, message = "Name must have at least 5 characters")
     private String name;
     
     @NotNull(message = "Amount is required")
@@ -28,13 +32,9 @@ public class GoalDto {
     @Digits(integer = 7, fraction = 2, message = "Amount must have up to 7 digits before the decimal and 2 digits after")
     private BigDecimal targetAmount;
     
-    private BigDecimal currentAmount;
-    
+    @NotNull(message = "Due month is required")
     private YearMonth dueMonth;
     
-    private Long categoryId;
-    
+    @NotNull(message = "Account ID is required")
     private Long accountId;
-    
-    private Long userId;
 }

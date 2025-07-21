@@ -6,7 +6,6 @@ import java.time.YearMonth;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.account.Account;
 import com.leo.fintech.auth.User;
-import com.leo.fintech.category.Category;
 import com.leo.fintech.converter.YearMonthAttributeConverter;
 
 import jakarta.persistence.Column;
@@ -42,16 +41,9 @@ public class Goal {
     @Column(name = "target_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal targetAmount;
 
-    @Column(name = "current_amount", precision = 10, scale = 2)
-    private BigDecimal currentAmount;
-
     @Column(name = "due_month")
     @Convert(converter = YearMonthAttributeConverter.class)
     private YearMonth dueMonth;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)

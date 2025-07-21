@@ -49,31 +49,23 @@ VALUES
     );
 
 -- Insert goals
-INSERT INTO goals (name, target_amount, current_amount, due_month, account_id, category_id, user_id)
+INSERT INTO goals (name, target_amount, due_month, account_id, user_id)
 VALUES
     (
         'Build Emergency Fund',
         15000.00,
-        10000.00,
         '2025-12',
         (SELECT a.id FROM accounts a 
          JOIN users u ON u.id = a.user_id 
          WHERE a.name = 'Emergency Savings' AND u.email = 'john.doe@example.com'),
-        (SELECT c.id FROM categories c 
-         JOIN users u ON u.id = c.user_id 
-         WHERE c.name = 'Salary' AND u.email = 'john.doe@example.com'),
         (SELECT id FROM users WHERE email = 'john.doe@example.com')
     ),
     (
         'European Vacation',
         5000.00,
-        3500.00,
         '2025-08',
         (SELECT a.id FROM accounts a 
          JOIN users u ON u.id = a.user_id 
          WHERE a.name = 'Vacation Fund' AND u.email = 'jane.smith@example.com'),
-        (SELECT c.id FROM categories c 
-         JOIN users u ON u.id = c.user_id 
-         WHERE c.name = 'Freelance Work' AND u.email = 'jane.smith@example.com'),
         (SELECT id FROM users WHERE email = 'jane.smith@example.com')
     );
