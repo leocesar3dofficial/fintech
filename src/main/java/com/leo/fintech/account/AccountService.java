@@ -20,10 +20,9 @@ public class AccountService {
     private final UserRepository userRepository;
 
     public AccountService(
-        AccountRepository accountRepository,
-        AccountMapper accountMapper,                      
-        UserRepository userRepository
-        ) {
+            AccountRepository accountRepository,
+            AccountMapper accountMapper,
+            UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.accountMapper = accountMapper;
@@ -31,7 +30,7 @@ public class AccountService {
 
     public List<AccountDto> getAccountsByUser() {
         UUID userId = SecurityUtils.extractUserId();
-        
+
         return accountRepository.findAllByUserId(userId).stream()
                 .map(accountMapper::toDto)
                 .collect(Collectors.toList());
@@ -46,7 +45,7 @@ public class AccountService {
     public AccountDto createAccountForUser(AccountDto dto) {
         UUID userId = SecurityUtils.extractUserId();
         final com.leo.fintech.auth.User userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
         Account account = accountMapper.toEntity(dto);
         account.setUser(userEntity);
 

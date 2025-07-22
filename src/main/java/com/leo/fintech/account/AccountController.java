@@ -23,7 +23,6 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-
     @GetMapping
     public List<AccountDto> getAllAccounts() {
         return accountService.getAccountsByUser();
@@ -35,7 +34,6 @@ public class AccountController {
         return account.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
 
     @PostMapping
     public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto) {
@@ -52,7 +50,7 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long id, @Valid @RequestBody AccountDto dto) {
         Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto);

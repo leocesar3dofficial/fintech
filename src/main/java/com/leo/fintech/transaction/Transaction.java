@@ -43,19 +43,19 @@ public class Transaction {
     @Column(name = "is_recurring")
     @Builder.Default
     private Boolean isRecurring = false;
-    
+
     @Column(length = 255)
     private String description;
-    
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     @JsonBackReference
     private Account account;
-    
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    
+
     @PrePersist
     public void prePersist() {
         if (isRecurring == null) {

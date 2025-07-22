@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-        public ResponseEntity<String> handleInvalidJson(HttpMessageNotReadableException ex) {
-    return ResponseEntity.badRequest().body("Malformed JSON request.");
+    public ResponseEntity<String> handleInvalidJson(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body("Malformed JSON request");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

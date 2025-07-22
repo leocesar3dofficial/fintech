@@ -19,49 +19,50 @@ public class JwtService {
 
     public String generateToken(String userId, String email, String username, String role) {
         return Jwts.builder()
-            .setSubject(userId)
-            .claim("email", email)
-            .claim("username", username)
-            .claim("role", role)
-            .setIssuedAt(new Date())
-            .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
-            .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
-            .compact();
+                .setSubject(userId)
+                .claim("email", email)
+                .claim("username", username)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
+                .compact();
     }
+
     public String extractRole(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .get("role", String.class);
+                .setSigningKey(SECRET_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
 
     public String extractUserId(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+                .setSigningKey(SECRET_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .get("email", String.class);
+                .setSigningKey(SECRET_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
     }
 
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .get("username", String.class);
+                .setSigningKey(SECRET_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("username", String.class);
     }
 
     // Removed duplicate extractUsername method
@@ -73,11 +74,11 @@ public class JwtService {
 
     public boolean isTokenExpired(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getExpiration()
-            .before(new Date());
+                .setSigningKey(SECRET_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .before(new Date());
     }
 }

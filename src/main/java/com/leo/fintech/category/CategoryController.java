@@ -39,8 +39,8 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto dto) {
         CategoryDto created = categoryService.createCategoryForUser(dto);
-        
-        return ResponseEntity.ok(created);          
+
+        return ResponseEntity.ok(created);
     }
 
     @DeleteMapping("/{id}")
@@ -50,15 +50,16 @@ public class CategoryController {
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();       
+            return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long id, @Valid @RequestBody CategoryDto dto) {
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long id,
+            @Valid @RequestBody CategoryDto dto) {
         Optional<CategoryDto> updated = categoryService.updateCategoryByUser(id, dto);
-        
+
         return updated.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build()); 
+                .orElse(ResponseEntity.notFound().build());
     }
 }

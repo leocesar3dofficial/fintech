@@ -19,10 +19,9 @@ public class CategoryService {
     private final UserRepository userRepository;
 
     public CategoryService(
-        CategoryRepository categoryRepository,
-        CategoryMapper categoryMapper,
-        UserRepository userRepository
-        ) {
+            CategoryRepository categoryRepository,
+            CategoryMapper categoryMapper,
+            UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
         this.userRepository = userRepository;
@@ -47,7 +46,7 @@ public class CategoryService {
         UUID userId = SecurityUtils.extractUserId();
 
         final User userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
         Category category = categoryMapper.toEntity(dto);
         category.setUser(userEntity);
         return categoryMapper.toDto(categoryRepository.save(category));
@@ -73,7 +72,7 @@ public class CategoryService {
             categoryRepository.deleteByIdAndUserId(id, userId);
             return true;
         }
-        
+
         return false;
     }
 }

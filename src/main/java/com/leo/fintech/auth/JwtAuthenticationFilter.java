@@ -23,8 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
         if (path.equals("/auth/register") || path.equals("/auth/login")) {
             filterChain.doFilter(request, response);
@@ -48,11 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Inject user info from token into a lightweight principal
                 JwtUserPrincipal principal = new JwtUserPrincipal(userId, email, username, role);
                 var authorities = java.util.Collections.singletonList(
-                    (GrantedAuthority) () -> "ROLE_" + role
-                );
+                        (GrantedAuthority) () -> "ROLE_" + role);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        principal, null, authorities
-                );
+                        principal, null, authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

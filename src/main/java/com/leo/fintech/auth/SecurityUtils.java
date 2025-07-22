@@ -7,7 +7,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityUtils {
     // Private constructor to prevent instantiation
-    private SecurityUtils() {}
+    private SecurityUtils() {
+    }
 
     public static UUID extractUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -21,9 +22,10 @@ public class SecurityUtils {
             return UUID.fromString(jwtUserPrincipal.getUserId());
         }
 
-        throw new IllegalArgumentException("Invalid principal type: " + (userPrincipal != null ? userPrincipal.getClass() : "null"));
+        throw new IllegalArgumentException(
+                "Invalid principal type: " + (userPrincipal != null ? userPrincipal.getClass() : "null"));
     }
-    
+
     public static Object getCurrentUserPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

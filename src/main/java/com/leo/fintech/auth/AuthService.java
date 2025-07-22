@@ -21,7 +21,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    
+
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException(request.getEmail());
@@ -36,27 +36,24 @@ public class AuthService {
         userRepository.save(user);
 
         String jwt = jwtService.generateToken(
-            user.getId().toString(),
-            user.getEmail(),
-            user.getUsername(),
-            user.getRole()
-        );
+                user.getId().toString(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getRole());
         return new AuthResponse(jwt);
     }
 
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             String jwt = jwtService.generateToken(
-                user.getId().toString(),
-                user.getEmail(),
-                user.getUsername(),
-                user.getRole()
-            );
+                    user.getId().toString(),
+                    user.getEmail(),
+                    user.getUsername(),
+                    user.getRole());
             return new AuthResponse(jwt);
         } catch (AuthenticationException ex) {
             return new AuthResponse("Invalid email or password.");
@@ -80,7 +77,7 @@ public class AuthService {
 
         return new UserDto(fallback, fallback); // No way to know real email & username from just a string
     }
-    
+
     @Transactional
     public void deleteUser(Authentication authentication) {
         Object principal = authentication.getPrincipal();

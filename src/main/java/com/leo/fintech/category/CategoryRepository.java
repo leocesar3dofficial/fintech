@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    
+
     List<Category> findAllByUserId(UUID userId);
 
     Optional<Category> findByIdAndUserId(Long id, UUID userId);

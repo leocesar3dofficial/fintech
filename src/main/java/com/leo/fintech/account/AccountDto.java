@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDto {
-   
+
     private Long id;
 
     @NotBlank(message = "Name is required")
@@ -28,7 +28,7 @@ public class AccountDto {
     @NotBlank(message = "Type is required")
     @Size(min = 5, message = "Type must have at least 5 characters")
     private String type;
-    
+
     @NotBlank(message = "Institution is required")
     @Size(min = 3, message = "Institution must have at least 3 characters")
     private String institution;

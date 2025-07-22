@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
-    
+
     @Mapping(source = "user.id", target = "userId")
     CategoryDto toDto(Category category);
 
