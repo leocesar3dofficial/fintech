@@ -25,11 +25,10 @@ public class BudgetService {
     private final BudgetMapper budgetMapper;
 
     public BudgetService(
-        BudgetRepository budgetRepository,
-        UserRepository userRepository,
-        CategoryRepository categoryRepository,
-        BudgetMapper budgetMapper
-    ) {
+            BudgetRepository budgetRepository,
+            UserRepository userRepository,
+            CategoryRepository categoryRepository,
+            BudgetMapper budgetMapper) {
         this.budgetRepository = budgetRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -40,11 +39,11 @@ public class BudgetService {
         UUID userId = SecurityUtils.extractUserId();
 
         final User userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
         Budget budget = budgetMapper.toEntity(dto);
         budget.setUser(userEntity);
         Category category = categoryRepository.findById(dto.getCategoryId())
-            .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         budget.setCategory(category);
         Budget saved = budgetRepository.save(budget);
 
@@ -66,33 +65,33 @@ public class BudgetService {
                 .map(budgetMapper::toDto);
     }
 
-@Transactional
-public BudgetDto updateBudget(Long id, BudgetDto dto) {
-    UUID userId = SecurityUtils.extractUserId();
-    
-    // Find the existing budget and verify user ownership
-    Budget existingBudget = budgetRepository.findByIdAndUserId(id, userId)
-            .orElseThrow(() -> new EntityNotFoundException("Budget not found or access denied"));
-    
-    // Handle category update if a category ID is provided
-    if (dto.getCategoryId() != null) {
-        // First, validate that the category exists and belongs to the user
-        Category category = categoryRepository.findByIdAndUserId(dto.getCategoryId(), userId)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found or access denied"));
-        
-        // Only update if the category is actually different
-        if (!dto.getCategoryId().equals(existingBudget.getCategory().getId())) {
-            existingBudget.setCategory(category);
+    @Transactional
+    public BudgetDto updateBudget(Long id, BudgetDto dto) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        // Find the existing budget and verify user ownership
+        Budget existingBudget = budgetRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Budget not found or access denied"));
+
+        // Handle category update if a category ID is provided
+        if (dto.getCategoryId() != null) {
+            // First, validate that the category exists and belongs to the user
+            Category category = categoryRepository.findByIdAndUserId(dto.getCategoryId(), userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found or access denied"));
+
+            // Only update if the category is actually different
+            if (!dto.getCategoryId().equals(existingBudget.getCategory().getId())) {
+                existingBudget.setCategory(category);
+            }
         }
+
+        // Update other fields from DTO
+        budgetMapper.updateEntityFromDto(dto, existingBudget);
+
+        // Save and return
+        Budget updated = budgetRepository.save(existingBudget);
+        return budgetMapper.toDto(updated);
     }
-    
-    // Update other fields from DTO
-    budgetMapper.updateEntityFromDto(dto, existingBudget);
-    
-    // Save and return
-    Budget updated = budgetRepository.save(existingBudget);
-    return budgetMapper.toDto(updated);
-}
 
     @Transactional
     public void deleteBudget(Long id) {

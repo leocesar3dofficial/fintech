@@ -1,4 +1,4 @@
-package com.leo.fintech.budget;
+package com.leo.fintech.goal;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,38 +18,38 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/budgets")
-public class BudgetController {
+@RequestMapping("/goals")
+public class GoalController {
 
     @Autowired
-    private BudgetService budgetService;
+    private GoalService goalService;
 
     @GetMapping
-    public List<BudgetDto> getAllBudgets() {
-        return budgetService.getBudgetsByUser();
+    public List<GoalDto> getAllGoals() {
+        return goalService.getGoalsByUser();
     }
 
     @PostMapping
-    public ResponseEntity<BudgetDto> createBudget(@Valid @RequestBody BudgetDto dto) {
-        BudgetDto created = budgetService.createBudgetForUser(dto);
+    public ResponseEntity<GoalDto> createGoal(@Valid @RequestBody GoalDto dto) {
+        GoalDto created = goalService.createGoalForUser(dto);
 
         return ResponseEntity.ok(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BudgetDto> getBudgetById(@PathVariable("id") Long id) {
-        Optional<BudgetDto> budget = budgetService.getBudgetByIdAndUser(id);
+    public ResponseEntity<GoalDto> getGoalById(@PathVariable("id") Long id) {
+        Optional<GoalDto> goal = goalService.getGoalByIdAndUser(id);
 
-        return budget.map(ResponseEntity::ok)
+        return goal.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BudgetDto> updateBudget(
+    public ResponseEntity<GoalDto> updateGoal(
             @PathVariable("id") Long id,
-            @Valid @RequestBody BudgetDto dto) {
+            @Valid @RequestBody GoalDto dto) {
         try {
-            BudgetDto updated = budgetService.updateBudget(id, dto);
+            GoalDto updated = goalService.updateGoal(id, dto);
             return ResponseEntity.ok(updated);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -57,9 +57,9 @@ public class BudgetController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBudget(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteGoal(@PathVariable("id") Long id) {
         try {
-            budgetService.deleteBudget(id);
+            goalService.deleteGoal(id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -67,8 +67,8 @@ public class BudgetController {
     }
 
     @DeleteMapping("/{id}/soft")
-    public ResponseEntity<Void> deleteBudgetSoft(@PathVariable("id") Long id) {
-        boolean deleted = budgetService.deleteBudgetIfExists(id);
+    public ResponseEntity<Void> deleteGoalSoft(@PathVariable("id") Long id) {
+        boolean deleted = goalService.deleteGoalIfExists(id);
 
         if (deleted) {
             return ResponseEntity.noContent().build();

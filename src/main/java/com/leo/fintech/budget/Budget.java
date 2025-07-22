@@ -27,7 +27,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "budgets")
 @Data
-@ToString(exclude = {"category", "user"})
+@ToString(exclude = { "category", "user" })
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

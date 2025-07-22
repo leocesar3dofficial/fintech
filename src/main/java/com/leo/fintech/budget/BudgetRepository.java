@@ -11,17 +11,17 @@ import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
-    
+
     Optional<Budget> findByIdAndUserId(Long id, UUID userId);
-    
+
     Optional<Budget> findByMonthAndCategoryAndUser(YearMonth month, Category category, User user);
-    
+
     List<Budget> findAllByUserId(UUID userId);
-    
+
     List<Budget> findAllByUserIdAndCategoryId(UUID userId, Long categoryId);
-    
+
     List<Budget> findByUser_IdAndMonth(UUID userId, YearMonth month);
-    
+
     void deleteByIdAndUserId(Long id, UUID userId);
 
     boolean existsByUser_IdAndCategory_IdAndMonth(UUID uuid, Long id, YearMonth month);
