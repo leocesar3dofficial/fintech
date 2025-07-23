@@ -93,6 +93,15 @@ public class TransactionService {
             }
         }
 
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findByIdAndUserId(dto.getCategoryId(), userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found or access denied"));
+
+            if (!dto.getCategoryId().equals(existingTransaction.getCategory().getId())) {
+                existingTransaction.setCategory(category);
+            }
+        }
+
         transactionMapper.updateEntityFromDto(dto, existingTransaction);
         Transaction updated = transactionRepository.save(existingTransaction);
 
