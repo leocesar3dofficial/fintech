@@ -11,6 +11,8 @@ import com.leo.fintech.account.Account;
 import com.leo.fintech.account.AccountRepository;
 import com.leo.fintech.auth.SecurityUtils;
 import com.leo.fintech.auth.UserRepository;
+import com.leo.fintech.category.Category;
+import com.leo.fintech.category.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -21,16 +23,19 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             UserRepository userRepository,
             AccountRepository accountRepository,
+            CategoryRepository categoryRepository,
             TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.categoryRepository = categoryRepository;
         this.transactionMapper = transactionMapper;
     }
 
@@ -38,10 +43,13 @@ public class TransactionService {
         UUID userId = SecurityUtils.extractUserId();
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
+        Account account = accountRepository.findByIdAndUserId(dto.getAccountId(), userId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
+        Category category = categoryRepository.findByIdAndUserId(dto.getCategoryId(), userId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found or access denied"));
         Transaction transaction = transactionMapper.toEntity(dto);
-        Account account = accountRepository.findById(dto.getAccountId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
         transaction.setAccount(account);
+        transaction.setCategory(category);
         Transaction saved = transactionRepository.save(transaction);
 
         return transactionMapper.toDto(saved);
@@ -56,7 +64,9 @@ public class TransactionService {
     }
 
     public List<TransactionDto> getTransactionsByAccount(Long accountId) {
-        return transactionRepository.findAllByAccountId(accountId).stream()
+        UUID userId = SecurityUtils.extractUserId();
+
+        return transactionRepository.findAllByAccount_IdAndAccount_User_Id(accountId, userId).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
