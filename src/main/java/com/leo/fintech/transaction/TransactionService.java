@@ -56,6 +56,14 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
+    public List<TransactionDto> getTransactionsByAccount(Long accountId) {
+        UUID userId = SecurityUtils.extractUserId();
+
+        return transactionRepository.findAllByAccountId(accountId, userId).stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     public Optional<TransactionDto> getTransactionByIdAndUser(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
@@ -111,4 +119,5 @@ public class TransactionService {
 
         return false;
     }
+
 }

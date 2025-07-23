@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findAllByAccountId(Long accountId);
+    List<Transaction> findAllByAccountId(Long accountId, UUID userId);
 
     Optional<Transaction> findByIdAndAccountId(Long id, Long accountId);
 
