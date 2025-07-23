@@ -68,28 +68,21 @@ public class GoalService {
     @Transactional
     public GoalDto updateGoal(Long id, GoalDto dto) {
         UUID userId = SecurityUtils.extractUserId();
-
-        // Find the existing goal and verify user ownership
         Goal existingGoal = goalRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found or access denied"));
 
-        // Handle account update if a account ID is provided
         if (dto.getAccountId() != null) {
-            // First, validate that the account exists and belongs to the user
             Account account = accountRepository.findByIdAndUserId(dto.getAccountId(), userId)
                     .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
 
-            // Only update if the account is actually different
             if (!dto.getAccountId().equals(existingGoal.getAccount().getId())) {
                 existingGoal.setAccount(account);
             }
         }
 
-        // Update other fields from DTO
         goalMapper.updateEntityFromDto(dto, existingGoal);
-
-        // Save and return
         Goal updated = goalRepository.save(existingGoal);
+
         return goalMapper.toDto(updated);
     }
 

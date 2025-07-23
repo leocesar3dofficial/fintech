@@ -36,7 +36,6 @@ public class TransactionService {
 
     public TransactionDto createTransactionForUser(TransactionDto dto) {
         UUID userId = SecurityUtils.extractUserId();
-
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Transaction transaction = transactionMapper.toEntity(dto);
@@ -51,15 +50,13 @@ public class TransactionService {
     public List<TransactionDto> getTransactionsByUser() {
         UUID userId = SecurityUtils.extractUserId();
 
-        return transactionRepository.findAllByUserId(userId).stream()
+        return transactionRepository.findAllByAccount_User_Id(userId).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<TransactionDto> getTransactionsByAccount(Long accountId) {
-        UUID userId = SecurityUtils.extractUserId();
-
-        return transactionRepository.findAllByAccountId(accountId, userId).stream()
+        return transactionRepository.findAllByAccountId(accountId).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -67,42 +64,35 @@ public class TransactionService {
     public Optional<TransactionDto> getTransactionByIdAndUser(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
-        return transactionRepository.findByIdAndUserId(id, userId)
+        return transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .map(transactionMapper::toDto);
     }
 
     @Transactional
     public TransactionDto updateTransaction(Long id, TransactionDto dto) {
         UUID userId = SecurityUtils.extractUserId();
-
-        // Find the existing transaction and verify user ownership
-        Transaction existingTransaction = transactionRepository.findByIdAndUserId(id, userId)
+        Transaction existingTransaction = transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found or access denied"));
 
-        // Handle account update if a account ID is provided
         if (dto.getAccountId() != null) {
-            // First, validate that the account exists and belongs to the user
             Account account = accountRepository.findByIdAndUserId(dto.getAccountId(), userId)
                     .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
 
-            // Only update if the account is actually different
             if (!dto.getAccountId().equals(existingTransaction.getAccount().getId())) {
                 existingTransaction.setAccount(account);
             }
         }
 
-        // Update other fields from DTO
         transactionMapper.updateEntityFromDto(dto, existingTransaction);
-
-        // Save and return
         Transaction updated = transactionRepository.save(existingTransaction);
+
         return transactionMapper.toDto(updated);
     }
 
     @Transactional
     public void deleteTransaction(Long id) {
         UUID userId = SecurityUtils.extractUserId();
-        Transaction transaction = transactionRepository.findByIdAndUserId(id, userId)
+        Transaction transaction = transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found or access denied"));
         transactionRepository.delete(transaction);
     }
@@ -110,7 +100,7 @@ public class TransactionService {
     @Transactional
     public boolean deleteTransactionIfExists(Long id) {
         UUID userId = SecurityUtils.extractUserId();
-        Optional<Transaction> transaction = transactionRepository.findByIdAndUserId(id, userId);
+        Optional<Transaction> transaction = transactionRepository.findByIdAndAccount_User_Id(id, userId);
 
         if (transaction.isPresent()) {
             transactionRepository.delete(transaction.get());

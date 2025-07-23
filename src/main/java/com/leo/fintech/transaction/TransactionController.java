@@ -30,7 +30,7 @@ public class TransactionController {
     }
 
     @GetMapping("/account/{id}")
-    public List<TransactionDto> getAllTransactionsFromAccount(@PathVariable("id") Long accountId) {
+    public List<TransactionDto> getAllTransactionsByAccount(@PathVariable("id") Long accountId) {
         return transactionService.getTransactionsByAccount(accountId);
     }
 
