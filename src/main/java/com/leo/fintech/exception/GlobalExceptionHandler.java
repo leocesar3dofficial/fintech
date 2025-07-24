@@ -21,9 +21,22 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidJson(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        
+        logger.warn("Invalid JSON request: {}", ex.getMessage());
+
+        Map<String, Object> errorResponse = createErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid request data",
+                "Invalid JSON format or data type mismatch in request body",
+                request);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({
-            HttpMessageNotReadableException.class,
-            MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
             IllegalArgumentException.class
     })
@@ -38,15 +51,21 @@ public class GlobalExceptionHandler {
                 "Please check your request format and data types",
                 request);
 
-        if (ex instanceof HttpMessageNotReadableException) {
-            errorResponse.put("details", "Invalid JSON format or data type mismatch in request body");
-        } else if (ex instanceof MethodArgumentNotValidException) {
-            errorResponse.put("details", "Request validation failed - check required fields and constraints");
-        } else if (ex instanceof MethodArgumentTypeMismatchException) {
+        if (ex instanceof MethodArgumentTypeMismatchException) {
             errorResponse.put("details", "Invalid parameter type in request URL or query string");
         }
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(JpaSystemException.class)
@@ -70,6 +89,13 @@ public class GlobalExceptionHandler {
                     request);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("email", ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(Exception.class)
@@ -99,27 +125,5 @@ public class GlobalExceptionHandler {
         errorResponse.put("path", request.getDescription(false).replace("uri=", ""));
 
         return errorResponse;
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleInvalidJson(HttpMessageNotReadableException ex) {
-        return ResponseEntity.badRequest().body("Malformed JSON request");
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("email", ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
     }
 }
