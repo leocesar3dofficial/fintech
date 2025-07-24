@@ -6,20 +6,15 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import jakarta.persistence.EntityManager;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -127,39 +122,4 @@ public class GlobalExceptionHandler {
         error.put("email", ex.getMessage());
         return ResponseEntity.badRequest().body(error);
     }
-}
-
-@Component
-class EntityStateHelper {
-
-    private static final Logger logger = LoggerFactory.getLogger(EntityStateHelper.class);
-
-    @Autowired
-    private EntityManager entityManager;
-
-    public <T> T safeSave(JpaRepository<T, ?> repository, T entity) {
-        try {
-            if (entityManager.contains(entity)) {
-                logger.debug("Entity is already managed, performing merge operation");
-                return entityManager.merge(entity);
-            } else {
-                logger.debug("Entity is not managed, performing save operation");
-                return repository.save(entity);
-            }
-        } catch (Exception e) {
-            logger.error("Error during safe save operation", e);
-            throw new RuntimeException("Failed to save entity safely", e);
-        }
-    }
-
-    public <T> boolean isManaged(T entity) {
-        return entityManager.contains(entity);
-    }
-
-    public <T> void detach(T entity) {
-        if (entityManager.contains(entity)) {
-            entityManager.detach(entity);
-        }
-    }
-
 }
