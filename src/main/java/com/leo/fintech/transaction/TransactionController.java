@@ -26,12 +26,12 @@ public class TransactionController {
 
     @GetMapping
     public List<TransactionDto> getAllTransactions() {
-        return transactionService.getTransactionsByUser();
+        return transactionService.getUserTransactions();
     }
 
     @GetMapping("/account/{id}")
     public List<TransactionDto> getAllTransactionsByAccount(@PathVariable("id") Long accountId) {
-        return transactionService.getTransactionsByAccount(accountId);
+        return transactionService.getAccountTransactions(accountId);
     }
 
     @PostMapping
@@ -43,7 +43,7 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TransactionDto> getTransactionById(@PathVariable("id") Long id) {
-        Optional<TransactionDto> transaction = transactionService.getTransactionByIdAndUser(id);
+        Optional<TransactionDto> transaction = transactionService.getUserTransactionById(id);
 
         return transaction.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

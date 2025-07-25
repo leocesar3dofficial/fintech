@@ -25,25 +25,25 @@ public class AccountController {
 
     @GetMapping
     public List<AccountDto> getAllAccounts() {
-        return accountService.getAccountsByUser();
+        return accountService.getUserAccounts();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDto> getAccountById(@PathVariable("id") Long id) {
-        Optional<AccountDto> account = accountService.getAccountByIdAndUser(id);
+        Optional<AccountDto> account = accountService.getUserAccountById(id);
         return account.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto) {
-        AccountDto created = accountService.createAccountForUser(dto);
+        AccountDto created = accountService.createUserAccount(dto);
         return ResponseEntity.ok(created);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAccount(@PathVariable("id") Long id) {
-        boolean deleted = accountService.deleteAccountByUser(id);
+        boolean deleted = accountService.deleteUserAccount(id);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
@@ -53,7 +53,7 @@ public class AccountController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long id, @Valid @RequestBody AccountDto dto) {
-        Optional<AccountDto> updated = accountService.updateAccountByUser(id, dto);
+        Optional<AccountDto> updated = accountService.updateUserAccount(id, dto);
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

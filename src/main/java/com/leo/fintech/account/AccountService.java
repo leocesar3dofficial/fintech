@@ -12,23 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.leo.fintech.auth.SecurityUtils;
 import com.leo.fintech.auth.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
 
-    public AccountService(
-            AccountRepository accountRepository,
-            AccountMapper accountMapper,
-            UserRepository userRepository) {
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
-        this.accountMapper = accountMapper;
-    }
-
-    public List<AccountDto> getAccountsByUser() {
+    public List<AccountDto> getUserAccounts() {
         UUID userId = SecurityUtils.extractUserId();
 
         return accountRepository.findAllByUserId(userId).stream()
@@ -36,13 +30,13 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<AccountDto> getAccountByIdAndUser(Long id) {
+    public Optional<AccountDto> getUserAccountById(Long id) {
         UUID userId = SecurityUtils.extractUserId();
         return accountRepository.findByIdAndUserId(id, userId)
                 .map(accountMapper::toDto);
     }
 
-    public AccountDto createAccountForUser(AccountDto dto) {
+    public AccountDto createUserAccount(AccountDto dto) {
         UUID userId = SecurityUtils.extractUserId();
         final com.leo.fintech.auth.User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
@@ -53,7 +47,7 @@ public class AccountService {
     }
 
     @Transactional
-    public Optional<AccountDto> updateAccountByUser(Long id, AccountDto dto) {
+    public Optional<AccountDto> updateUserAccount(Long id, AccountDto dto) {
         UUID userId = SecurityUtils.extractUserId();
 
         return accountRepository.findByIdAndUserId(id, userId).map(account -> {
@@ -65,7 +59,7 @@ public class AccountService {
     }
 
     @Transactional
-    public boolean deleteAccountByUser(Long id) {
+    public boolean deleteUserAccount(Long id) {
         UUID userId = SecurityUtils.extractUserId();
         Optional<Account> account = accountRepository.findByIdAndUserId(id, userId);
 

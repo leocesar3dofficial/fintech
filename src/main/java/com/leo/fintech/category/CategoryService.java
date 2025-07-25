@@ -12,22 +12,16 @@ import com.leo.fintech.auth.SecurityUtils;
 import com.leo.fintech.auth.User;
 import com.leo.fintech.auth.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final UserRepository userRepository;
 
-    public CategoryService(
-            CategoryRepository categoryRepository,
-            CategoryMapper categoryMapper,
-            UserRepository userRepository) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-        this.userRepository = userRepository;
-    }
-
-    public List<CategoryDto> getCategoriesByUser() {
+    public List<CategoryDto> getUserCategories() {
         UUID userId = SecurityUtils.extractUserId();
 
         return categoryRepository.findAllByUserId(userId).stream()
@@ -35,14 +29,14 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<CategoryDto> getCategoryByIdAndUser(Long id) {
+    public Optional<CategoryDto> getUserCategoryById(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
         return categoryRepository.findByIdAndUserId(id, userId)
                 .map(categoryMapper::toDto);
     }
 
-    public CategoryDto createCategoryForUser(CategoryDto dto) {
+    public CategoryDto createUserCategory(CategoryDto dto) {
         UUID userId = SecurityUtils.extractUserId();
 
         final User userEntity = userRepository.findById(userId)
@@ -53,7 +47,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Optional<CategoryDto> updateCategoryByUser(Long id, CategoryDto dto) {
+    public Optional<CategoryDto> updateCategory(Long id, CategoryDto dto) {
         UUID userId = SecurityUtils.extractUserId();
 
         return categoryRepository.findByIdAndUserId(id, userId).map(category -> {
@@ -64,7 +58,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Boolean deleteCategoryByUser(Long id) {
+    public Boolean deleteCategory(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
         Optional<Category> category = categoryRepository.findByIdAndUserId(id, userId);

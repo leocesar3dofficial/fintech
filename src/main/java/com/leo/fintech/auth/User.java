@@ -7,6 +7,9 @@ import java.util.UUID;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.leo.fintech.account.Account;
@@ -21,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +44,7 @@ public class User {
     private UUID id;
 
     @Column(nullable = false, length = 255)
+    @Email
     private String email;
 
     @Column(nullable = false, length = 255)
@@ -52,9 +57,11 @@ public class User {
     private String username;
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp(source = SourceType.DB)
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false, updatable = false, insertable = false)
+    @UpdateTimestamp(source = SourceType.DB)
     private OffsetDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)

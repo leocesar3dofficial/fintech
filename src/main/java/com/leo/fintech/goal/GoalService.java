@@ -15,8 +15,10 @@ import com.leo.fintech.account.AccountRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GoalService {
 
     private final GoalRepository goalRepository;
@@ -24,18 +26,7 @@ public class GoalService {
     private final AccountRepository accountRepository;
     private final GoalMapper goalMapper;
 
-    public GoalService(
-            GoalRepository goalRepository,
-            UserRepository userRepository,
-            AccountRepository accountRepository,
-            GoalMapper goalMapper) {
-        this.goalRepository = goalRepository;
-        this.userRepository = userRepository;
-        this.accountRepository = accountRepository;
-        this.goalMapper = goalMapper;
-    }
-
-    public GoalDto createGoalForUser(GoalDto dto) {
+    public GoalDto createUserGoal(GoalDto dto) {
         UUID userId = SecurityUtils.extractUserId();
 
         final User userEntity = userRepository.findById(userId)
@@ -50,7 +41,7 @@ public class GoalService {
         return goalMapper.toDto(saved);
     }
 
-    public List<GoalDto> getGoalsByUser() {
+    public List<GoalDto> getUserGoals() {
         UUID userId = SecurityUtils.extractUserId();
 
         return goalRepository.findAllByUserId(userId).stream()

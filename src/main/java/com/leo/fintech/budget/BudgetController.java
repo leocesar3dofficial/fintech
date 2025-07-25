@@ -26,19 +26,19 @@ public class BudgetController {
 
     @GetMapping
     public List<BudgetDto> getAllBudgets() {
-        return budgetService.getBudgetsByUser();
+        return budgetService.getUserBudgets();
     }
 
     @PostMapping
     public ResponseEntity<BudgetDto> createBudget(@Valid @RequestBody BudgetDto dto) {
-        BudgetDto created = budgetService.createBudgetForUser(dto);
+        BudgetDto created = budgetService.createUserBudget(dto);
 
         return ResponseEntity.ok(created);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BudgetDto> getBudgetById(@PathVariable("id") Long id) {
-        Optional<BudgetDto> budget = budgetService.getBudgetByIdAndUser(id);
+        Optional<BudgetDto> budget = budgetService.getUserBudgetById(id);
 
         return budget.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

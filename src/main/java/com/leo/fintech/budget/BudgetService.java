@@ -15,8 +15,10 @@ import com.leo.fintech.category.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
@@ -24,18 +26,7 @@ public class BudgetService {
     private final CategoryRepository categoryRepository;
     private final BudgetMapper budgetMapper;
 
-    public BudgetService(
-            BudgetRepository budgetRepository,
-            UserRepository userRepository,
-            CategoryRepository categoryRepository,
-            BudgetMapper budgetMapper) {
-        this.budgetRepository = budgetRepository;
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
-        this.budgetMapper = budgetMapper;
-    }
-
-    public BudgetDto createBudgetForUser(BudgetDto dto) {
+    public BudgetDto createUserBudget(BudgetDto dto) {
         UUID userId = SecurityUtils.extractUserId();
 
         final User userEntity = userRepository.findById(userId)
@@ -50,7 +41,7 @@ public class BudgetService {
         return budgetMapper.toDto(saved);
     }
 
-    public List<BudgetDto> getBudgetsByUser() {
+    public List<BudgetDto> getUserBudgets() {
         UUID userId = SecurityUtils.extractUserId();
 
         return budgetRepository.findAllByUserId(userId).stream()
@@ -58,7 +49,7 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<BudgetDto> getBudgetByIdAndUser(Long id) {
+    public Optional<BudgetDto> getUserBudgetById(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
         return budgetRepository.findByIdAndUserId(id, userId)

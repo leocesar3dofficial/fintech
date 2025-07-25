@@ -25,12 +25,12 @@ public class CategoryController {
 
     @GetMapping
     public List<CategoryDto> getAllCategories() {
-        return categoryService.getCategoriesByUser();
+        return categoryService.getUserCategories();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable("id") Long id) {
-        Optional<CategoryDto> category = categoryService.getCategoryByIdAndUser(id);
+        Optional<CategoryDto> category = categoryService.getUserCategoryById(id);
 
         return category.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -38,14 +38,14 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto dto) {
-        CategoryDto created = categoryService.createCategoryForUser(dto);
+        CategoryDto created = categoryService.createUserCategory(dto);
 
         return ResponseEntity.ok(created);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
-        boolean deleted = categoryService.deleteCategoryByUser(id);
+        boolean deleted = categoryService.deleteCategory(id);
 
         if (deleted) {
             return ResponseEntity.noContent().build();
@@ -57,7 +57,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long id,
             @Valid @RequestBody CategoryDto dto) {
-        Optional<CategoryDto> updated = categoryService.updateCategoryByUser(id, dto);
+        Optional<CategoryDto> updated = categoryService.updateCategory(id, dto);
 
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

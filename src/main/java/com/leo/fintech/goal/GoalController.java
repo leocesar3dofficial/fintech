@@ -26,12 +26,12 @@ public class GoalController {
 
     @GetMapping
     public List<GoalDto> getAllGoals() {
-        return goalService.getGoalsByUser();
+        return goalService.getUserGoals();
     }
 
     @PostMapping
     public ResponseEntity<GoalDto> createGoal(@Valid @RequestBody GoalDto dto) {
-        GoalDto created = goalService.createGoalForUser(dto);
+        GoalDto created = goalService.createUserGoal(dto);
 
         return ResponseEntity.ok(created);
     }

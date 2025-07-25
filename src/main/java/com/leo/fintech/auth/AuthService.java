@@ -23,7 +23,9 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
+
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
@@ -40,6 +42,7 @@ public class AuthService {
                 user.getEmail(),
                 user.getUsername(),
                 user.getRole());
+
         return new AuthResponse(jwt);
     }
 
@@ -54,8 +57,10 @@ public class AuthService {
                     user.getEmail(),
                     user.getUsername(),
                     user.getRole());
+
             return new AuthResponse(jwt);
         } catch (AuthenticationException ex) {
+
             return new AuthResponse("Invalid email or password.");
         }
     }
@@ -64,32 +69,40 @@ public class AuthService {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails customUserDetails) {
-            com.leo.fintech.auth.User user = customUserDetails.getUser();
+
+            User user = customUserDetails.getUser();
+
             return new UserDto(user.getUsername(), user.getEmail());
+
         } else if (principal instanceof JwtUserPrincipal jwtUserPrincipal) {
+
             return new UserDto(jwtUserPrincipal.getUsername(), jwtUserPrincipal.getEmail());
         }
 
-        // fallback: UserDetails or String (username only, email unknown)
         String fallback = principal instanceof UserDetails
                 ? ((UserDetails) principal).getUsername()
                 : principal.toString();
 
-        return new UserDto(fallback, fallback); // No way to know real email & username from just a string
+        return new UserDto(fallback, fallback);
     }
 
     @Transactional
     public void deleteUser(Authentication authentication) {
+
         Object principal = authentication.getPrincipal();
+
         if (principal instanceof CustomUserDetails customUserDetails) {
+
             User user = customUserDetails.getUser();
             userRepository.deleteById(user.getId());
+
         } else if (principal instanceof UserDetails userDetails) {
-            // fallback: try to find by email/username
+
             String email = userDetails.getUsername();
             userRepository.findByEmail(email).ifPresent(user -> userRepository.deleteById(user.getId()));
+
         } else if (principal instanceof String str) {
-            // fallback: try to find by string username
+
             userRepository.findByEmail(str).ifPresent(user -> userRepository.deleteById(user.getId()));
         }
     }

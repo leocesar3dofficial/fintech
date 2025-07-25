@@ -16,8 +16,10 @@ import com.leo.fintech.category.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
@@ -25,19 +27,6 @@ public class TransactionService {
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
-
-    public TransactionService(
-            TransactionRepository transactionRepository,
-            UserRepository userRepository,
-            AccountRepository accountRepository,
-            CategoryRepository categoryRepository,
-            TransactionMapper transactionMapper) {
-        this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-        this.accountRepository = accountRepository;
-        this.categoryRepository = categoryRepository;
-        this.transactionMapper = transactionMapper;
-    }
 
     public TransactionDto createTransactionForUser(TransactionDto dto) {
         UUID userId = SecurityUtils.extractUserId();
@@ -55,7 +44,7 @@ public class TransactionService {
         return transactionMapper.toDto(saved);
     }
 
-    public List<TransactionDto> getTransactionsByUser() {
+    public List<TransactionDto> getUserTransactions() {
         UUID userId = SecurityUtils.extractUserId();
 
         return transactionRepository.findAllByAccount_User_Id(userId).stream()
@@ -63,7 +52,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public List<TransactionDto> getTransactionsByAccount(Long accountId) {
+    public List<TransactionDto> getAccountTransactions(Long accountId) {
         UUID userId = SecurityUtils.extractUserId();
 
         return transactionRepository.findAllByAccount_IdAndAccount_User_Id(accountId, userId).stream()
@@ -71,7 +60,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<TransactionDto> getTransactionByIdAndUser(Long id) {
+    public Optional<TransactionDto> getUserTransactionById(Long id) {
         UUID userId = SecurityUtils.extractUserId();
 
         return transactionRepository.findByIdAndAccount_User_Id(id, userId)
