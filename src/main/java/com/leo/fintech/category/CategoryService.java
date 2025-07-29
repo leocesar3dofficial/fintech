@@ -1,12 +1,15 @@
 package com.leo.fintech.category;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.leo.fintech.auth.SecurityUtils;
 import com.leo.fintech.auth.User;
@@ -20,13 +23,26 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final UserRepository userRepository;
+    private static final int PAGE_SIZE = 10;
 
-    public List<CategoryDto> getUserCategories() {
+    public Page<CategoryDto> getUserCategories(int page, String sort, String filter) {
         UUID userId = SecurityUtils.extractUserId();
 
-        return categoryRepository.findAllByUserId(userId).stream()
-                .map(categoryMapper::toDto)
-                .collect(Collectors.toList());
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        Sort.Direction sortDirection = sortParams.length > 1 && "desc".equalsIgnoreCase(sortParams[1])
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(sortDirection, sortField));
+
+        if (StringUtils.hasText(filter)) {
+            return categoryRepository.findAllByUserIdAndNameIgnoreCaseContaining(userId, filter, pageable)
+                    .map(categoryMapper::toDto);
+        }
+
+        return categoryRepository.findAllByUserId(userId, pageable)
+                .map(categoryMapper::toDto);
     }
 
     public Optional<CategoryDto> getUserCategoryById(Long id) {

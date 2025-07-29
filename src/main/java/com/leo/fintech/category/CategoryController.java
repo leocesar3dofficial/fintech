@@ -1,9 +1,13 @@
 package com.leo.fintech.category;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -24,8 +29,19 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getAllCategories() {
-        return categoryService.getUserCategories();
+    public PagedModel<EntityModel<CategoryDto>> getAllCategories(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sort", defaultValue = "name,asc") String sort,
+            @RequestParam(name = "filter", defaultValue = "") String filter,
+            PagedResourcesAssembler<CategoryDto> assembler) {
+
+        Page<CategoryDto> resultPage = categoryService.getUserCategories(page, sort, filter);
+
+        return assembler.toModel(resultPage, category -> EntityModel.of(category,
+                WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(CategoryController.class).getAllCategories(page, sort, filter,
+                                assembler))
+                        .withSelfRel()));
     }
 
     @GetMapping("/{id}")
