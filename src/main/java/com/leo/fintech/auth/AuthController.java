@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<AuthResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         String errorMsg = ex.getBindingResult().getFieldErrors().stream()
@@ -60,35 +61,36 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody PasswordResetRequest request) {
         authService.requestPasswordReset(request);
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "If the email exists, a password reset link has been sent");
-        
+
         return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody PasswordChangeRequest request) {
         authService.resetPassword(request);
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "Password has been reset successfully");
-        
+
         return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping("/change-password")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Map<String, String>> changePassword(
             Authentication authentication,
             @Valid @RequestBody UpdatePasswordRequest request) {
-        
+
         String userEmail = authentication.getName(); // Assuming email is used as username
         authService.updatePassword(userEmail, request);
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "Password updated successfully");
-        
+
         return ResponseEntity.ok(response);
     }
+
 }
