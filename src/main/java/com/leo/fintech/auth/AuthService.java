@@ -1,5 +1,8 @@
 package com.leo.fintech.auth;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,17 +13,32 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.leo.fintech.exception.EmailAlreadyExistsException;
+import com.leo.fintech.exception.InvalidPasswordException;
+import com.leo.fintech.exception.InvalidTokenException;
+import com.leo.fintech.exception.UserNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
+    @Autowired
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private EmailService emailService;
 
     public AuthResponse register(RegisterRequest request) {
 
@@ -106,4 +124,79 @@ public class AuthService {
             userRepository.findByEmail(str).ifPresent(user -> userRepository.deleteById(user.getId()));
         }
     }
+
+    public void requestPasswordReset(PasswordResetRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+
+        if (userOpt.isEmpty()) {
+            // Don't reveal if email exists or not for security
+            log.warn("Password reset requested for non-existent email: {}", request.getEmail());
+            return;
+        }
+
+        User user = userOpt.get();
+
+        // Generate JWT reset token
+        String resetToken = jwtService.generatePasswordResetToken(
+                user.getId().toString(),
+                user.getEmail());
+
+        // Send email
+        emailService.sendPasswordResetEmail(user.getEmail(), resetToken);
+
+        log.info("Password reset token generated for user: {}", user.getEmail());
+    }
+
+    @Transactional
+    public void resetPassword(PasswordChangeRequest request) {
+        // Validate the JWT reset token
+        if (!jwtService.isPasswordResetTokenValid(request.getToken())) {
+            throw new InvalidTokenException("Invalid or expired reset token");
+        }
+
+        try {
+            // Extract email from token
+            String email = jwtService.extractEmailFromResetToken(request.getToken());
+            String userId = jwtService.extractUserIdFromResetToken(request.getToken());
+
+            // Find user
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            // Verify user ID matches token
+            if (!user.getId().toString().equals(userId)) {
+                throw new InvalidTokenException("Token user mismatch");
+            }
+
+            // Update password
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+
+            log.info("Password successfully reset for user: {}", user.getEmail());
+
+        } catch (Exception e) {
+            if (e instanceof InvalidTokenException || e instanceof UserNotFoundException) {
+                throw e;
+            }
+            throw new InvalidTokenException("Invalid reset token");
+        }
+    }
+
+    @Transactional
+    public void updatePassword(String userEmail, UpdatePasswordRequest request) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Current password is incorrect");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        log.info("Password updated successfully for user: {}", user.getEmail());
+    }
+
 }
