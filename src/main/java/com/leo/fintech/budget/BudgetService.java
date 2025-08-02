@@ -79,6 +79,7 @@ public class BudgetService {
         if (dto.getCategoryId() != null) {
             Category category = categoryRepository.findByIdAndUserId(dto.getCategoryId(), userId)
                     .orElseThrow(() -> new EntityNotFoundException("Category not found or access denied"));
+
             if (!dto.getCategoryId().equals(existingBudget.getCategory().getId())) {
                 existingBudget.setCategory(category);
             }
@@ -112,10 +113,12 @@ public class BudgetService {
     public boolean deleteBudgetIfExists(Long id) {
         UUID userId = SecurityUtils.extractUserId();
         Optional<Budget> budget = budgetRepository.findByIdAndUserId(id, userId);
+        
         if (budget.isPresent()) {
             budgetRepository.delete(budget.get());
             return true;
         }
+        
         return false;
     }
 
