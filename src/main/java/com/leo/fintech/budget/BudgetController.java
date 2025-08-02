@@ -38,10 +38,11 @@ public class BudgetController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BudgetDto> getBudgetById(@PathVariable("id") Long id) {
-        Optional<BudgetDto> budget = budgetService.getUserBudgetById(id);
+        BudgetDto budget = budgetService.getUserBudgetById(id);
 
-        return budget.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return budget != null
+                ? ResponseEntity.ok(budget)
+                : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
