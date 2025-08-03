@@ -12,10 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.exception.EmailAlreadyExistsException;
-import com.leo.fintech.exception.InvalidPasswordException;
-import com.leo.fintech.exception.InvalidTokenException;
-import com.leo.fintech.exception.UserNotFoundException;
+import com.leo.fintech.common.exception.EmailAlreadyExistsException;
+import com.leo.fintech.common.exception.InvalidPasswordException;
+import com.leo.fintech.common.exception.InvalidTokenException;
+import com.leo.fintech.common.exception.UserNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

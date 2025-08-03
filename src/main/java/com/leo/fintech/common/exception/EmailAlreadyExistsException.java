@@ -1,4 +1,4 @@
-package com.leo.fintech.exception;
+package com.leo.fintech.common.exception;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String email) {

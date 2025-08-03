@@ -1,4 +1,4 @@
-package com.leo.fintech.common;
+package com.leo.fintech.common.ratelimit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

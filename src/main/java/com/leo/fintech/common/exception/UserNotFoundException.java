@@ -1,4 +1,4 @@
-package com.leo.fintech.exception;
+package com.leo.fintech.common.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

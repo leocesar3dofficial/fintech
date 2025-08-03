@@ -1,4 +1,4 @@
-package com.leo.fintech.common;
+package com.leo.fintech.common.ratelimit;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

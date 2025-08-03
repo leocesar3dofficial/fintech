@@ -1,4 +1,4 @@
-package com.leo.fintech.converter;
+package com.leo.fintech.common.converter;
 
 import java.time.YearMonth;
 

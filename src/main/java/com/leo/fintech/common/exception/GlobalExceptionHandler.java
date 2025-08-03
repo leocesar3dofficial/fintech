@@ -1,4 +1,4 @@
-package com.leo.fintech.exception;
+package com.leo.fintech.common.exception;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
