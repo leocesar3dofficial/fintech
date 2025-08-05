@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.logging;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

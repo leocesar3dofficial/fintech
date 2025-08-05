@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.common.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

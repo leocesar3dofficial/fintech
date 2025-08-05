@@ -8,8 +8,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
+import com.leo.fintech.user.User;
 
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget, Long> {

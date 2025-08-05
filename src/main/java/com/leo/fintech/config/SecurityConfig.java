@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.config;
 
 import java.util.Arrays;
 
@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.leo.fintech.auth.JwtAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
 

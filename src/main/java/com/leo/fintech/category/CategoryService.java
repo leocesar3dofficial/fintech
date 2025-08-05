@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.leo.fintech.auth.SecurityUtils;
-import com.leo.fintech.auth.User;
-import com.leo.fintech.auth.UserRepository;
+import com.leo.fintech.common.security.SecurityUtils;
+import com.leo.fintech.user.User;
+import com.leo.fintech.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

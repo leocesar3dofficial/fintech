@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.time.YearMonth;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.leo.fintech.auth.User;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.common.converter.YearMonthAttributeConverter;
+import com.leo.fintech.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

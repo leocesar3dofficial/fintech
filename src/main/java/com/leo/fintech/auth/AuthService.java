@@ -16,6 +16,11 @@ import com.leo.fintech.common.exception.EmailAlreadyExistsException;
 import com.leo.fintech.common.exception.InvalidPasswordException;
 import com.leo.fintech.common.exception.InvalidTokenException;
 import com.leo.fintech.common.exception.UserNotFoundException;
+import com.leo.fintech.email.EmailService;
+import com.leo.fintech.user.CustomUserDetails;
+import com.leo.fintech.user.User;
+import com.leo.fintech.user.UserDto;
+import com.leo.fintech.user.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

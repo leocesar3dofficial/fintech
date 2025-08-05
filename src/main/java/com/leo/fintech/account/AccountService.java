@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.leo.fintech.auth.SecurityUtils;
-import com.leo.fintech.auth.UserRepository;
+import com.leo.fintech.common.security.SecurityUtils;
+import com.leo.fintech.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +38,7 @@ public class AccountService {
 
     public AccountDto createUserAccount(AccountDto dto) {
         UUID userId = SecurityUtils.extractUserId();
-        final com.leo.fintech.auth.User userEntity = userRepository.findById(userId)
+        final com.leo.fintech.user.User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Account account = accountMapper.toEntity(dto);
         account.setUser(userEntity);

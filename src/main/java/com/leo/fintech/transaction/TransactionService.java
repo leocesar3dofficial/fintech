@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.leo.fintech.account.Account;
 import com.leo.fintech.account.AccountRepository;
-import com.leo.fintech.auth.SecurityUtils;
-import com.leo.fintech.auth.UserRepository;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.category.CategoryRepository;
+import com.leo.fintech.common.security.SecurityUtils;
+import com.leo.fintech.user.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

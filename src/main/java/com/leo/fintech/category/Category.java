@@ -1,7 +1,7 @@
 package com.leo.fintech.category;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.leo.fintech.auth.User;
+import com.leo.fintech.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

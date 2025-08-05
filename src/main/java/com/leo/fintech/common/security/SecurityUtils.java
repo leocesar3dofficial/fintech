@@ -1,9 +1,12 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.common.security;
 
 import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.leo.fintech.auth.JwtUserPrincipal;
+import com.leo.fintech.user.CustomUserDetails;
 
 public class SecurityUtils {
     // Private constructor to prevent instantiation

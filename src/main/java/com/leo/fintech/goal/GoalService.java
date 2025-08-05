@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.auth.SecurityUtils;
-import com.leo.fintech.auth.User;
-import com.leo.fintech.auth.UserRepository;
+import com.leo.fintech.common.security.SecurityUtils;
+import com.leo.fintech.user.User;
+import com.leo.fintech.user.UserRepository;
 import com.leo.fintech.account.Account;
 import com.leo.fintech.account.AccountRepository;
 

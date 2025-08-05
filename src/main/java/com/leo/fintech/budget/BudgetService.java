@@ -11,11 +11,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.auth.SecurityUtils;
-import com.leo.fintech.auth.User;
-import com.leo.fintech.auth.UserRepository;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.category.CategoryRepository;
+import com.leo.fintech.common.security.SecurityUtils;
+import com.leo.fintech.user.User;
+import com.leo.fintech.user.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -31,7 +31,7 @@ public class BudgetService {
     private final CategoryRepository categoryRepository;
     private final BudgetMapper budgetMapper;
 
-    @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.auth.SecurityUtils).extractUserId()")
+    @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     public BudgetDto createUserBudget(BudgetDto dto) {
         UUID userId = SecurityUtils.extractUserId();
         final User userEntity = userRepository.findById(userId)
@@ -48,7 +48,7 @@ public class BudgetService {
         return result;
     }
 
-    @Cacheable(value = "userBudgets", key = "T(com.leo.fintech.auth.SecurityUtils).extractUserId()")
+    @Cacheable(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     public List<BudgetDto> getUserBudgets() {
         UUID userId = SecurityUtils.extractUserId();
         log.debug("Fetching budgets from database for user: {}", userId);
@@ -57,7 +57,7 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.auth.SecurityUtils).extractUserId()", unless = "#result == null")
+    @Cacheable(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()", unless = "#result == null")
     public BudgetDto getUserBudgetById(Long id) {
         UUID userId = SecurityUtils.extractUserId();
         log.debug("Fetching budget {} from database for user: {}", id, userId);
@@ -68,8 +68,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.auth.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.auth.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
+            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
     public BudgetDto updateBudget(Long id, BudgetDto dto) {
         UUID userId = SecurityUtils.extractUserId();
@@ -95,8 +95,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.auth.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.auth.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
+            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
     public void deleteBudget(Long id) {
         UUID userId = SecurityUtils.extractUserId();
@@ -107,8 +107,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.auth.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.auth.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
+            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
     public boolean deleteBudgetIfExists(Long id) {
         UUID userId = SecurityUtils.extractUserId();
@@ -122,7 +122,7 @@ public class BudgetService {
         return false;
     }
 
-    @CachePut(value = "individualBudget", key = "#budget.id + '_' + #budget.userId")
+    @CachePut(value = "individualBudget", key = "'budget_' + #budget.id + '_' + #budget.userId")
     public BudgetDto cacheIndividualBudget(BudgetDto budget) {
         return budget;
     }

@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.common.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

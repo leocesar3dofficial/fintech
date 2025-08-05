@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.user;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.user;
 
 import java.util.Collection;
 import java.util.Collections;

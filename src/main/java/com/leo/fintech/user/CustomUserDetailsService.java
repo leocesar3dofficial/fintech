@@ -1,4 +1,4 @@
-package com.leo.fintech.auth;
+package com.leo.fintech.user;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
