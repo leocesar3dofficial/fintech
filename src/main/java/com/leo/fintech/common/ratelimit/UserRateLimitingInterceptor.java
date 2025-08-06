@@ -53,8 +53,8 @@ public class UserRateLimitingInterceptor implements HandlerInterceptor {
     private final Map<UUID, RateLimitInfo> rateLimits = new ConcurrentHashMap<>();
     private final AtomicLong lastCleanupTime = new AtomicLong(System.currentTimeMillis());
 
-    private static final long CLEANUP_INTERVAL_MILLIS = 60_000; // 1 minute
-    private static final long MAX_IDLE_MINUTES = 5; // Evict entries idle for 5+ minutes
+    private static final long CLEANUP_INTERVAL_MILLIS = 60_000;
+    private static final long MAX_IDLE_MINUTES = 5;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,

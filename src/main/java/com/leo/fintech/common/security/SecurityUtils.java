@@ -9,7 +9,6 @@ import com.leo.fintech.auth.JwtUserPrincipal;
 import com.leo.fintech.user.CustomUserDetails;
 
 public class SecurityUtils {
-    // Private constructor to prevent instantiation
     private SecurityUtils() {
     }
 

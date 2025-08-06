@@ -86,7 +86,7 @@ public class AuthController {
             Authentication authentication,
             @Valid @RequestBody UpdatePasswordRequest request) {
 
-        String userEmail = authentication.getName(); // Assuming email is used as username
+        String userEmail = authentication.getName();
         authService.updatePassword(userEmail, request);
 
         Map<String, String> response = new HashMap<>();

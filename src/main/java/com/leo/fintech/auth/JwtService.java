@@ -37,7 +37,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("email", email)
-                .claim("type", "PASSWORD_RESET") // Token type claim
+                .claim("type", "PASSWORD_RESET")
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plus(RESET_TOKEN_EXPIRATION, ChronoUnit.SECONDS)))
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
