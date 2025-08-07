@@ -89,7 +89,6 @@ public class AuthController {
         UserDto user = authService.getUserDto(authentication);
         String userEmail = user.getEmail();
         authService.updatePassword(userEmail, request);
-
         Map<String, String> response = new HashMap<>();
         response.put("message", "Password updated successfully");
 

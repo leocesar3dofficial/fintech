@@ -46,7 +46,6 @@ public class AuthService {
     private EmailService emailService;
 
     public AuthResponse register(RegisterRequest request) {
-
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
 
             throw new EmailAlreadyExistsException(request.getEmail());
@@ -59,7 +58,6 @@ public class AuthService {
                 .role("USER")
                 .build();
         userRepository.save(user);
-
         String jwt = jwtService.generateToken(
                 user.getId().toString(),
                 user.getEmail(),
@@ -83,7 +81,6 @@ public class AuthService {
 
             return new AuthResponse(jwt);
         } catch (AuthenticationException ex) {
-
             return new AuthResponse("Invalid email or password.");
         }
     }
@@ -92,7 +89,6 @@ public class AuthService {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails customUserDetails) {
-
             User user = customUserDetails.getUser();
 
             return new UserDto(user.getUsername(), user.getEmail());
@@ -115,17 +111,12 @@ public class AuthService {
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails customUserDetails) {
-
             User user = customUserDetails.getUser();
             userRepository.deleteById(user.getId());
-
         } else if (principal instanceof UserDetails userDetails) {
-
             String email = userDetails.getUsername();
             userRepository.findByEmail(email).ifPresent(user -> userRepository.deleteById(user.getId()));
-
         } else if (principal instanceof String str) {
-
             userRepository.findByEmail(str).ifPresent(user -> userRepository.deleteById(user.getId()));
         }
     }
@@ -165,7 +156,6 @@ public class AuthService {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user);
             log.info("Password successfully reset for user: {}", user.getEmail());
-
         } catch (Exception e) {
             if (e instanceof InvalidTokenException || e instanceof UserNotFoundException) {
                 throw e;
@@ -188,5 +178,4 @@ public class AuthService {
         userRepository.save(user);
         log.info("Password updated successfully for user: {}", user.getEmail());
     }
-
 }
