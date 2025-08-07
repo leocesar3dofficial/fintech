@@ -9,13 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-
-    List<Transaction> findAllByAccountId(Long accountId);
     
-    Optional<Transaction> findByIdAndAccountId(Long id, Long accountId);
-    
-    void deleteByIdAndAccountId(Long id, Long accountId);
-
     List<Transaction> findAllByAccount_User_Id(UUID userId);
     
     Optional<Transaction> findByIdAndAccount_User_Id(Long id, UUID userId);

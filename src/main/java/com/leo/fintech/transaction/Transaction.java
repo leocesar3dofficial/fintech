@@ -47,6 +47,9 @@ public class Transaction {
     @Column(length = 255)
     private String description;
 
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private Long accountId;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     @JsonBackReference

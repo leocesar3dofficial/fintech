@@ -1,5 +1,7 @@
 package com.leo.fintech.category;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.user.User;
 
@@ -35,6 +37,9 @@ public class Category {
     @Column(name = "is_income", nullable = false)
     private Boolean isIncome;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private UUID userId;
+    
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference

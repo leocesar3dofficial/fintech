@@ -2,6 +2,7 @@ package com.leo.fintech.budget;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.category.Category;
@@ -43,6 +44,9 @@ public class Budget {
     @Column(nullable = false)
     @Convert(converter = YearMonthAttributeConverter.class)
     private YearMonth month;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private UUID userId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

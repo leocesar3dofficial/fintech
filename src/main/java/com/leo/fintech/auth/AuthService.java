@@ -92,9 +92,7 @@ public class AuthService {
             User user = customUserDetails.getUser();
 
             return new UserDto(user.getUsername(), user.getEmail());
-
         } else if (principal instanceof JwtUserPrincipal jwtUserPrincipal) {
-
             return new UserDto(jwtUserPrincipal.getUsername(), jwtUserPrincipal.getEmail());
         }
 

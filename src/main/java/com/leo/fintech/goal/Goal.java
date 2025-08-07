@@ -2,6 +2,7 @@ package com.leo.fintech.goal;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.leo.fintech.account.Account;
@@ -45,6 +46,9 @@ public class Goal {
     @Convert(converter = YearMonthAttributeConverter.class)
     private YearMonth dueMonth;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private UUID userId;
+    
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
