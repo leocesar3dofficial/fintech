@@ -7,11 +7,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.common.security.SecurityUtils;
-import com.leo.fintech.user.User;
-import com.leo.fintech.user.UserRepository;
 import com.leo.fintech.account.Account;
 import com.leo.fintech.account.AccountRepository;
+import com.leo.fintech.user.User;
+import com.leo.fintech.user.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -26,9 +25,7 @@ public class GoalService {
     private final AccountRepository accountRepository;
     private final GoalMapper goalMapper;
 
-    public GoalDto createUserGoal(GoalDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public GoalDto createUserGoal(GoalDto dto, UUID userId) {
         final User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Goal goal = goalMapper.toEntity(dto);
@@ -41,24 +38,19 @@ public class GoalService {
         return goalMapper.toDto(saved);
     }
 
-    public List<GoalDto> getUserGoals() {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public List<GoalDto> getUserGoals(UUID userId) {
         return goalRepository.findAllByUserId(userId).stream()
                 .map(goalMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<GoalDto> getGoalByIdAndUser(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public Optional<GoalDto> getGoalByIdAndUser(Long id, UUID userId) {
         return goalRepository.findByIdAndUserId(id, userId)
                 .map(goalMapper::toDto);
     }
 
     @Transactional
-    public GoalDto updateGoal(Long id, GoalDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public GoalDto updateGoal(Long id, GoalDto dto, UUID userId) {
         Goal existingGoal = goalRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found or access denied"));
 
@@ -78,16 +70,14 @@ public class GoalService {
     }
 
     @Transactional
-    public void deleteGoal(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public void deleteGoal(Long id, UUID userId) {
         Goal goal = goalRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found or access denied"));
         goalRepository.delete(goal);
     }
 
     @Transactional
-    public boolean deleteGoalIfExists(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public boolean deleteGoalIfExists(Long id, UUID userId) {
         Optional<Goal> goal = goalRepository.findByIdAndUserId(id, userId);
 
         if (goal.isPresent()) {

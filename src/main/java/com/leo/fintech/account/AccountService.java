@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.leo.fintech.common.security.SecurityUtils;
 import com.leo.fintech.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,22 +21,18 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
 
-    public List<AccountDto> getUserAccounts() {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public List<AccountDto> getUserAccounts(UUID userId) {
         return accountRepository.findAllByUserId(userId).stream()
                 .map(accountMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<AccountDto> getUserAccountById(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public Optional<AccountDto> getUserAccountById(Long id, UUID userId) {
         return accountRepository.findByIdAndUserId(id, userId)
                 .map(accountMapper::toDto);
     }
 
-    public AccountDto createUserAccount(AccountDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public AccountDto createUserAccount(AccountDto dto, UUID userId) {
         final com.leo.fintech.user.User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Account account = accountMapper.toEntity(dto);
@@ -47,9 +42,7 @@ public class AccountService {
     }
 
     @Transactional
-    public Optional<AccountDto> updateUserAccount(Long id, AccountDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public Optional<AccountDto> updateUserAccount(Long id, AccountDto dto, UUID userId) {
         return accountRepository.findByIdAndUserId(id, userId).map(account -> {
             account.setName(dto.getName());
             account.setType(dto.getType());
@@ -59,8 +52,7 @@ public class AccountService {
     }
 
     @Transactional
-    public boolean deleteUserAccount(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public boolean deleteUserAccount(Long id, UUID userId) {
         Optional<Account> account = accountRepository.findByIdAndUserId(id, userId);
 
         if (account.isPresent()) {

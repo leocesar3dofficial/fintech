@@ -11,7 +11,6 @@ import com.leo.fintech.account.Account;
 import com.leo.fintech.account.AccountRepository;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.category.CategoryRepository;
-import com.leo.fintech.common.security.SecurityUtils;
 import com.leo.fintech.user.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -28,8 +27,7 @@ public class TransactionService {
     private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
 
-    public TransactionDto createTransactionForUser(TransactionDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public TransactionDto createTransactionForUser(TransactionDto dto, UUID userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Account account = accountRepository.findByIdAndUserId(dto.getAccountId(), userId)
@@ -44,32 +42,25 @@ public class TransactionService {
         return transactionMapper.toDto(saved);
     }
 
-    public List<TransactionDto> getUserTransactions() {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public List<TransactionDto> getUserTransactions(UUID userId) {
         return transactionRepository.findAllByAccount_User_Id(userId).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public List<TransactionDto> getAccountTransactions(Long accountId) {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public List<TransactionDto> getAccountTransactions(Long accountId, UUID userId) {
         return transactionRepository.findAllByAccount_IdAndAccount_User_Id(accountId, userId).stream()
                 .map(transactionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<TransactionDto> getUserTransactionById(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
-
+    public Optional<TransactionDto> getUserTransactionById(Long id, UUID userId) {
         return transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .map(transactionMapper::toDto);
     }
 
     @Transactional
-    public TransactionDto updateTransaction(Long id, TransactionDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public TransactionDto updateTransaction(Long id, TransactionDto dto, UUID userId) {
         Transaction existingTransaction = transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found or access denied"));
 
@@ -98,16 +89,14 @@ public class TransactionService {
     }
 
     @Transactional
-    public void deleteTransaction(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public void deleteTransaction(Long id, UUID userId) {
         Transaction transaction = transactionRepository.findByIdAndAccount_User_Id(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found or access denied"));
         transactionRepository.delete(transaction);
     }
 
     @Transactional
-    public boolean deleteTransactionIfExists(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public boolean deleteTransactionIfExists(Long id, UUID userId) {
         Optional<Transaction> transaction = transactionRepository.findByIdAndAccount_User_Id(id, userId);
 
         if (transaction.isPresent()) {

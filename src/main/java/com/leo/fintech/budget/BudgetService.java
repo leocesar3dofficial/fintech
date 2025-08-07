@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.leo.fintech.category.Category;
 import com.leo.fintech.category.CategoryRepository;
-import com.leo.fintech.common.security.SecurityUtils;
 import com.leo.fintech.user.User;
 import com.leo.fintech.user.UserRepository;
 
@@ -32,8 +31,7 @@ public class BudgetService {
     private final BudgetMapper budgetMapper;
 
     @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
-    public BudgetDto createUserBudget(BudgetDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public BudgetDto createUserBudget(BudgetDto dto, UUID userId) {
         final User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Budget budget = budgetMapper.toEntity(dto);
@@ -49,18 +47,18 @@ public class BudgetService {
     }
 
     @Cacheable(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
-    public List<BudgetDto> getUserBudgets() {
-        UUID userId = SecurityUtils.extractUserId();
+    public List<BudgetDto> getUserBudgets(UUID userId) {
         log.debug("Fetching budgets from database for user: {}", userId);
+     
         return budgetRepository.findAllByUserId(userId).stream()
                 .map(budgetMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Cacheable(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()", unless = "#result == null")
-    public BudgetDto getUserBudgetById(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public BudgetDto getUserBudgetById(Long id, UUID userId) {
         log.debug("Fetching budget {} from database for user: {}", id, userId);
+      
         return budgetRepository.findByIdAndUserId(id, userId)
                 .map(budgetMapper::toDto)
                 .orElse(null);
@@ -71,8 +69,7 @@ public class BudgetService {
             @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
             @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
-    public BudgetDto updateBudget(Long id, BudgetDto dto) {
-        UUID userId = SecurityUtils.extractUserId();
+    public BudgetDto updateBudget(Long id, BudgetDto dto, UUID userId) {
         Budget existingBudget = budgetRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found or access denied"));
 
@@ -98,8 +95,7 @@ public class BudgetService {
             @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
             @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
-    public void deleteBudget(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public void deleteBudget(Long id, UUID userId) {
         Budget budget = budgetRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Budget not found or access denied"));
         budgetRepository.delete(budget);
@@ -110,15 +106,14 @@ public class BudgetService {
             @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
             @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
     })
-    public boolean deleteBudgetIfExists(Long id) {
-        UUID userId = SecurityUtils.extractUserId();
+    public boolean deleteBudgetIfExists(Long id, UUID userId) {
         Optional<Budget> budget = budgetRepository.findByIdAndUserId(id, userId);
-        
+
         if (budget.isPresent()) {
             budgetRepository.delete(budget.get());
             return true;
         }
-        
+
         return false;
     }
 
