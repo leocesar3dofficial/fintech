@@ -30,7 +30,7 @@ public class BudgetService {
     private final CategoryRepository categoryRepository;
     private final BudgetMapper budgetMapper;
 
-    @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
+    @CacheEvict(value = "userBudgets", key = "#userId")
     public BudgetDto createUserBudget(BudgetDto dto, UUID userId) {
         final User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
@@ -46,7 +46,7 @@ public class BudgetService {
         return result;
     }
 
-    @Cacheable(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
+    @Cacheable(value = "userBudgets", key = "#userId")
     public List<BudgetDto> getUserBudgets(UUID userId) {
         log.debug("Fetching budgets from database for user: {}", userId);
      
@@ -55,7 +55,7 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()", unless = "#result == null")
+    @Cacheable(value = "individualBudget", key = "#userId" + '_' + "#id")
     public BudgetDto getUserBudgetById(Long id, UUID userId) {
         log.debug("Fetching budget {} from database for user: {}", id, userId);
       
@@ -66,8 +66,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public BudgetDto updateBudget(Long id, BudgetDto dto, UUID userId) {
         Budget existingBudget = budgetRepository.findByIdAndUserId(id, userId)
@@ -92,8 +92,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public void deleteBudget(Long id, UUID userId) {
         Budget budget = budgetRepository.findByIdAndUserId(id, userId)
@@ -103,8 +103,8 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#id + '_' + T(com.leo.fintech.common.security.SecurityUtils).extractUserId()"),
-            @CacheEvict(value = "userBudgets", key = "T(com.leo.fintech.common.security.SecurityUtils).extractUserId()")
+            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public boolean deleteBudgetIfExists(Long id, UUID userId) {
         Optional<Budget> budget = budgetRepository.findByIdAndUserId(id, userId);
