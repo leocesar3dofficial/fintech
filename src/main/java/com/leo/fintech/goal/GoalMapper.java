@@ -11,11 +11,13 @@ public interface GoalMapper {
     GoalDto toDto(Goal goal);
 
     @Mapping(source = "accountId", target = "account.id")
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "user", ignore = true)
     Goal toEntity(GoalDto dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
     @Mapping(target = "account", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "user", ignore = true)
     void updateEntityFromDto(GoalDto dto, @MappingTarget Goal goal);
 }
