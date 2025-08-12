@@ -55,7 +55,7 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "individualBudget", key = "#userId" + '_' + "#id")
+    @Cacheable(value = "individualBudget", key = "#userId + '_' + #id")
     public BudgetDto getUserBudgetById(Long id, UUID userId) {
         log.debug("Fetching budget {} from database for user: {}", id, userId);
       
@@ -66,7 +66,7 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "individualBudget", key = "#userId + '_' + #id"),
             @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public BudgetDto updateBudget(Long id, BudgetDto dto, UUID userId) {
@@ -92,7 +92,7 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "individualBudget", key = "#userId + '_' + #id"),
             @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public void deleteBudget(Long id, UUID userId) {
@@ -103,7 +103,7 @@ public class BudgetService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "individualBudget", key = "#userId" + '_' + "#id"),
+            @CacheEvict(value = "individualBudget", key = "#userId + '_' + #id"),
             @CacheEvict(value = "userBudgets", key = "#userId")
     })
     public boolean deleteBudgetIfExists(Long id, UUID userId) {
