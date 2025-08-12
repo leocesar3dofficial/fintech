@@ -71,7 +71,7 @@ public class UserRateLimitingInterceptor implements HandlerInterceptor {
 
         cleanupStaleEntriesIfNeeded();
 
-        RateLimitInfo rateLimitInfo = rateLimits.computeIfAbsent(userId, _ -> new RateLimitInfo());
+        RateLimitInfo rateLimitInfo = rateLimits.computeIfAbsent(userId, k -> new RateLimitInfo());
 
         if (rateLimitInfo.tryConsume()) {
             return true;
