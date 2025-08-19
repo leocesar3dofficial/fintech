@@ -16,6 +16,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByIdAndUserId(Long id, UUID userId);
 
+    Optional<Category> findFirstByUserIdOrderByIdAsc(UUID userId);
+    
     void deleteByIdAndUserId(Long id, UUID userId);
 
     List<Category> findAllByUserIdAndIsIncome(UUID userId, Boolean isIncome);
