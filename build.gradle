@@ -48,6 +48,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+	implementation 'com.opencsv:opencsv:5.12.0'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
