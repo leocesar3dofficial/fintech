@@ -1,10 +1,12 @@
 package com.leo.fintech.transaction;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.leo.fintech.auth.JwtUserPrincipal;
 
@@ -50,6 +54,41 @@ public class TransactionController {
         TransactionDto created = transactionService.createTransactionForUser(dto, userId);
 
         return ResponseEntity.ok(created);
+    }
+
+    @PostMapping("/csv/import")
+    public ResponseEntity<?> importTransactionsFromCsv(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
+
+        try {
+            // Validate file
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Please select a CSV file to upload"));
+            }
+
+            String filename = file.getOriginalFilename();
+            if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Please upload a valid CSV file"));
+            }
+
+            UUID userId = UUID.fromString(userPrincipal.getUserId());
+            List<TransactionDto> importedTransactions = transactionService.importTransactionsFromCsv(file, userId);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "CSV imported successfully",
+                    "importedCount", importedTransactions.size(),
+                    "transactions", importedTransactions));
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to import CSV: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
