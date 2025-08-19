@@ -67,13 +67,13 @@ public class TransactionService {
                     .orElseThrow(() -> new IllegalStateException("No category found for user"));
 
             // Parse CSV
-            List<CsvRecordBancoDoBrasil> csvRecords = parseCsvFile(file);
+            List<TransactionCsvRecord> csvRecords = parseCsvFile(file);
 
             // Convert to DTOs and save
             List<TransactionDto> savedTransactions = new ArrayList<>();
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
-            for (CsvRecordBancoDoBrasil record : csvRecords) {
+            for (TransactionCsvRecord record : csvRecords) {
                 try {
                     // Skip records with invalid data
                     if (record.getData() == null || record.getValor() == null ||
@@ -118,11 +118,11 @@ public class TransactionService {
         }
     }
 
-    private List<CsvRecordBancoDoBrasil> parseCsvFile(MultipartFile file) throws IOException {
+    private List<TransactionCsvRecord> parseCsvFile(MultipartFile file) throws IOException {
         // try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.ISO_8859_1)) {
-            CsvToBean<CsvRecordBancoDoBrasil> csvToBean = new CsvToBeanBuilder<CsvRecordBancoDoBrasil>(reader)
-                    .withType(CsvRecordBancoDoBrasil.class)
+            CsvToBean<TransactionCsvRecord> csvToBean = new CsvToBeanBuilder<TransactionCsvRecord>(reader)
+                    .withType(TransactionCsvRecord.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreEmptyLine(true)
                     .build();

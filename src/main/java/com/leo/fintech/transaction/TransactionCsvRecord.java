@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CsvRecordBancoDoBrasil {
+public class TransactionCsvRecord {
     @CsvBindByName(column = "Data")
     private String data;
 
