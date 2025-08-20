@@ -62,7 +62,6 @@ public class TransactionController {
             @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
 
         try {
-            // Validate file
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Please select a CSV file to upload"));

@@ -55,42 +55,33 @@ public class TransactionService {
 
     public List<TransactionDto> importTransactionsFromCsv(MultipartFile file, UUID userId) {
         try {
-            // Validate user exists
             userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalStateException("User not found"));
 
-            // Get default account and category
             Account defaultAccount = accountRepository.findFirstByUserIdOrderByIdAsc(userId)
                     .orElseThrow(() -> new IllegalStateException("No account found for user"));
 
             Category defaultCategory = categoryRepository.findFirstByUserIdOrderByIdAsc(userId)
                     .orElseThrow(() -> new IllegalStateException("No category found for user"));
 
-            // Parse CSV
             List<TransactionCsvRecord> csvRecords = parseCsvFile(file);
-
-            // Convert to DTOs and save
             List<TransactionDto> savedTransactions = new ArrayList<>();
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
             for (TransactionCsvRecord record : csvRecords) {
                 try {
-                    // Skip records with invalid data
                     if (record.getData() == null || record.getValor() == null ||
                             record.getData().trim().isEmpty() || record.getValor().trim().isEmpty()) {
                         continue;
                     }
 
-                    // Parse date
                     LocalDate transactionDate = LocalDate.parse(record.getData().trim(), dateFormatter);
-
-                    // Parse amount and make it positive if negative
                     BigDecimal amount = new BigDecimal(record.getValor().replace(",", "."));
+
                     if (amount.compareTo(BigDecimal.ZERO) < 0) {
                         amount = amount.negate();
                     }
 
-                    // Create DTO
                     TransactionDto dto = TransactionDto.builder()
                             .amount(amount)
                             .date(transactionDate)
@@ -100,12 +91,10 @@ public class TransactionService {
                             .categoryId(defaultCategory.getId())
                             .build();
 
-                    // Save transaction
                     TransactionDto savedTransaction = createTransactionForUser(dto, userId);
                     savedTransactions.add(savedTransaction);
 
                 } catch (Exception e) {
-                    // Log the error and continue with next record
                     System.err.println("Error processing CSV record: " + e.getMessage());
                     continue;
                 }
@@ -119,7 +108,6 @@ public class TransactionService {
     }
 
     private List<TransactionCsvRecord> parseCsvFile(MultipartFile file) throws IOException {
-        // try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.ISO_8859_1)) {
             CsvToBean<TransactionCsvRecord> csvToBean = new CsvToBeanBuilder<TransactionCsvRecord>(reader)
                     .withType(TransactionCsvRecord.class)
