@@ -1,18 +1,13 @@
 package com.leo.fintech.transaction;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +16,6 @@ import com.leo.fintech.account.AccountRepository;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.category.CategoryRepository;
 import com.leo.fintech.user.UserRepository;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -33,10 +26,22 @@ import lombok.RequiredArgsConstructor;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
-    private final AccountRepository accountRepository;
-    private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
+
+    @Autowired
+    private CsvBankDetector bankDetector;
+
+    @Autowired
+    private CsvParserFactory csvParserFactory;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public TransactionDto createTransactionForUser(TransactionDto dto, UUID userId) {
         userRepository.findById(userId)
@@ -64,39 +69,19 @@ public class TransactionService {
             Category defaultCategory = categoryRepository.findFirstByUserIdOrderByIdAsc(userId)
                     .orElseThrow(() -> new IllegalStateException("No category found for user"));
 
-            List<TransactionCsvRecord> csvRecords = parseCsvFile(file);
+            BankType bankType = bankDetector.detectBankTypeFromFile(file);
+            List<? extends CsvTransactionRecord> csvRecords = parseCsvByBankType(file, bankType);
             List<TransactionDto> savedTransactions = new ArrayList<>();
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
-            for (TransactionCsvRecord record : csvRecords) {
+            for (CsvTransactionRecord record : csvRecords) {
                 try {
-                    if (record.getData() == null || record.getValor() == null ||
-                            record.getData().trim().isEmpty() || record.getValor().trim().isEmpty()) {
-                        continue;
+                    TransactionDto dto = record.toTransactionDto(defaultAccount.getId(), defaultCategory.getId());
+                    if (dto != null) {
+                        TransactionDto savedTransaction = createTransactionForUser(dto, userId);
+                        savedTransactions.add(savedTransaction);
                     }
-
-                    LocalDate transactionDate = LocalDate.parse(record.getData().trim(), dateFormatter);
-                    BigDecimal amount = new BigDecimal(record.getValor().replace(",", "."));
-
-                    if (amount.compareTo(BigDecimal.ZERO) < 0) {
-                        amount = amount.negate();
-                    }
-
-                    TransactionDto dto = TransactionDto.builder()
-                            .amount(amount)
-                            .date(transactionDate)
-                            .isRecurring(false)
-                            .description(record.getHistorico() != null ? record.getHistorico().trim() : "")
-                            .accountId(defaultAccount.getId())
-                            .categoryId(defaultCategory.getId())
-                            .build();
-
-                    TransactionDto savedTransaction = createTransactionForUser(dto, userId);
-                    savedTransactions.add(savedTransaction);
-
                 } catch (Exception e) {
                     System.err.println("Error processing CSV record: " + e.getMessage());
-                    continue;
                 }
             }
 
@@ -107,15 +92,15 @@ public class TransactionService {
         }
     }
 
-    private List<TransactionCsvRecord> parseCsvFile(MultipartFile file) throws IOException {
-        try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.ISO_8859_1)) {
-            CsvToBean<TransactionCsvRecord> csvToBean = new CsvToBeanBuilder<TransactionCsvRecord>(reader)
-                    .withType(TransactionCsvRecord.class)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .withIgnoreEmptyLine(true)
-                    .build();
-
-            return csvToBean.parse();
+    private List<? extends CsvTransactionRecord> parseCsvByBankType(MultipartFile file, BankType bankType)
+            throws IOException {
+        switch (bankType) {
+            case BANCO_DO_BRASIL:
+                return csvParserFactory.parseCsvFile(file, BancoDoBrasilCsvRecord.class, bankType);
+            case BANK_OF_AMERICA:
+                return csvParserFactory.parseCsvFile(file, BankOfAmericaCsvRecord.class, bankType);
+            default:
+                throw new IllegalArgumentException("Unsupported bank type: " + bankType);
         }
     }
 
@@ -183,5 +168,4 @@ public class TransactionService {
 
         return false;
     }
-
 }

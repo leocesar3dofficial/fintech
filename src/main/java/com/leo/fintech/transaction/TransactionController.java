@@ -1,9 +1,11 @@
 package com.leo.fintech.transaction;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private CsvBankDetector bankDetector;
 
     @GetMapping
     public List<TransactionDto> getAllTransactions(@AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
@@ -73,11 +78,21 @@ public class TransactionController {
                         .body(Map.of("error", "Please upload a valid CSV file"));
             }
 
+            BankType detectedBank;
+            
+            try {
+                detectedBank = bankDetector.detectBankTypeFromFile(file);
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Unsupported CSV format: " + e.getMessage()));
+            }
+
             UUID userId = UUID.fromString(userPrincipal.getUserId());
             List<TransactionDto> importedTransactions = transactionService.importTransactionsFromCsv(file, userId);
 
             return ResponseEntity.ok(Map.of(
                     "message", "CSV imported successfully",
+                    "bankType", detectedBank.getDisplayName(),
                     "importedCount", importedTransactions.size(),
                     "transactions", importedTransactions));
 
@@ -88,6 +103,16 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to import CSV: " + e.getMessage()));
         }
+    }
+
+    @GetMapping("/csv/supported-banks")
+    public ResponseEntity<?> getSupportedBanks() {
+        Map<String, String> supportedBanks = Arrays.stream(BankType.values())
+                .collect(Collectors.toMap(
+                        BankType::name,
+                        BankType::getDisplayName));
+
+        return ResponseEntity.ok(Map.of("supportedBanks", supportedBanks));
     }
 
     @GetMapping("/{id}")
