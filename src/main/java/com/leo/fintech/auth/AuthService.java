@@ -1,6 +1,7 @@
 package com.leo.fintech.auth;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -105,17 +106,25 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(Authentication authentication) {
-
         Object principal = authentication.getPrincipal();
 
-        if (principal instanceof CustomUserDetails customUserDetails) {
-            User user = customUserDetails.getUser();
-            userRepository.deleteById(user.getId());
+        if (principal instanceof JwtUserPrincipal jwt) {
+            String userId = jwt.getUserId();
+            
+            if (userId != null && !userId.isEmpty()) {
+                userRepository.deleteById(UUID.fromString(userId));
+            } else {
+                userRepository.findByEmail(jwt.getEmail()).ifPresent(user -> userRepository.deleteById(user.getId()));
+            }
+        } else if (principal instanceof CustomUserDetails custom) {
+            userRepository.deleteById(custom.getUser().getId());
         } else if (principal instanceof UserDetails userDetails) {
-            String email = userDetails.getUsername();
+            userRepository.findByEmail(userDetails.getUsername())
+                    .ifPresent(user -> userRepository.deleteById(user.getId()));
+        } else if (principal instanceof String email) {
             userRepository.findByEmail(email).ifPresent(user -> userRepository.deleteById(user.getId()));
-        } else if (principal instanceof String str) {
-            userRepository.findByEmail(str).ifPresent(user -> userRepository.deleteById(user.getId()));
+        } else {
+            throw new IllegalArgumentException("Unsupported principal type: " + principal.getClass().getSimpleName());
         }
     }
 
