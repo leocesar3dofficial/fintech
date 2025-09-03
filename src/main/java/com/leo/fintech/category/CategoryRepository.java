@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,6 +20,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findFirstByUserIdOrderByIdAsc(UUID userId);
     
     void deleteByIdAndUserId(Long id, UUID userId);
+
+    @Modifying
+    void deleteAllByUserId(UUID userId);
 
     List<Category> findAllByUserIdAndIsIncome(UUID userId, Boolean isIncome);
 

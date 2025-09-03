@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -68,7 +66,6 @@ public class Account {
     private User user;
 
     @OneToMany(mappedBy = "account", orphanRemoval = true)
-    @Cascade(CascadeType.ALL)
     @JsonManagedReference
     private final List<Transaction> transactions = new ArrayList<>();
 }

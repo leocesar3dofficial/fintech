@@ -13,16 +13,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.leo.fintech.account.AccountRepository;
+import com.leo.fintech.budget.BudgetRepository;
+import com.leo.fintech.category.CategoryRepository;
 import com.leo.fintech.common.exception.EmailAlreadyExistsException;
 import com.leo.fintech.common.exception.InvalidPasswordException;
 import com.leo.fintech.common.exception.InvalidTokenException;
 import com.leo.fintech.common.exception.UserNotFoundException;
 import com.leo.fintech.email.EmailService;
+import com.leo.fintech.goal.GoalRepository;
+import com.leo.fintech.transaction.TransactionRepository;
 import com.leo.fintech.user.CustomUserDetails;
 import com.leo.fintech.user.User;
 import com.leo.fintech.user.UserDto;
 import com.leo.fintech.user.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +37,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
+
+    private final TransactionRepository transactionRepository;
+    private final BudgetRepository budgetRepository;
+    private final GoalRepository goalRepository;
+    private final AccountRepository accountRepository;
+    private final CategoryRepository categoryRepository;
+
     @Autowired
     private final AuthenticationManager authenticationManager;
 
@@ -45,6 +58,39 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    private UUID extractUserId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof JwtUserPrincipal jwt) {
+            String userId = jwt.getUserId();
+            if (userId != null && !userId.isEmpty()) {
+                return UUID.fromString(userId);
+            }
+            return userRepository.findByEmail(jwt.getEmail())
+                    .map(User::getId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        }
+
+        if (principal instanceof CustomUserDetails custom) {
+            return custom.getUser().getId();
+        }
+
+        if (principal instanceof UserDetails userDetails) {
+            return userRepository.findByEmail(userDetails.getUsername())
+                    .map(User::getId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        }
+
+        if (principal instanceof String email) {
+            return userRepository.findByEmail(email)
+                    .map(User::getId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        }
+
+        throw new IllegalArgumentException("Unsupported principal type: " +
+                principal.getClass().getSimpleName());
+    }
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -106,26 +152,18 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
+        UUID userId = extractUserId(authentication);
 
-        if (principal instanceof JwtUserPrincipal jwt) {
-            String userId = jwt.getUserId();
-            
-            if (userId != null && !userId.isEmpty()) {
-                userRepository.deleteById(UUID.fromString(userId));
-            } else {
-                userRepository.findByEmail(jwt.getEmail()).ifPresent(user -> userRepository.deleteById(user.getId()));
-            }
-        } else if (principal instanceof CustomUserDetails custom) {
-            userRepository.deleteById(custom.getUser().getId());
-        } else if (principal instanceof UserDetails userDetails) {
-            userRepository.findByEmail(userDetails.getUsername())
-                    .ifPresent(user -> userRepository.deleteById(user.getId()));
-        } else if (principal instanceof String email) {
-            userRepository.findByEmail(email).ifPresent(user -> userRepository.deleteById(user.getId()));
-        } else {
-            throw new IllegalArgumentException("Unsupported principal type: " + principal.getClass().getSimpleName());
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found");
         }
+
+        transactionRepository.deleteAllByUserId(userId);
+        budgetRepository.deleteAllByUserId(userId);
+        goalRepository.deleteAllByUserId(userId);
+        categoryRepository.deleteAllByUserId(userId);
+        accountRepository.deleteAllByUserId(userId);
+        userRepository.deleteById(userId);
     }
 
     public void requestPasswordReset(PasswordResetRequest request) {

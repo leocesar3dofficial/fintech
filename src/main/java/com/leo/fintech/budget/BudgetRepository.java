@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import com.leo.fintech.category.Category;
@@ -25,6 +26,9 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     List<Budget> findByUser_IdAndMonth(UUID userId, YearMonth month);
 
     void deleteByIdAndUserId(Long id, UUID userId);
+
+    @Modifying
+    void deleteAllByUserId(UUID userId);
 
     boolean existsByUser_IdAndCategory_IdAndMonth(UUID uuid, Long id, YearMonth month);
 

@@ -5,14 +5,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    
+
     List<Transaction> findAllByAccount_User_Id(UUID userId);
-    
+
     Optional<Transaction> findByIdAndAccount_User_Id(Long id, UUID userId);
-    
+
     List<Transaction> findAllByAccount_IdAndAccount_User_Id(Long accountId, UUID userId);
+
+    @Modifying
+    @Query("DELETE FROM Transaction t WHERE t.account.id IN (SELECT a.id FROM Account a WHERE a.user.id = :userId)")
+    void deleteAllByUserId(UUID userId);
+
 }
