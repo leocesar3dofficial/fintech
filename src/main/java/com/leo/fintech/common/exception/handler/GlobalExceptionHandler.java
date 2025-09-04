@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = ErrorResponseUtil.build(
                 HttpStatus.NOT_FOUND,
-                "Not Found",
                 ex.getMessage(),
+                "The requested resource could not be found or access is denied",
                 request);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -37,10 +37,10 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = ErrorResponseUtil.build(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal Server Error",
+                "Internal server error",
                 "An unexpected error occurred while processing your request",
                 request);
 
-        return ResponseEntity.internalServerError().body(errorResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
