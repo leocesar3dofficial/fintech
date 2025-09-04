@@ -48,7 +48,7 @@ public class Goal {
 
     @Column(name = "user_id", insertable = false, updatable = false)
     private UUID userId;
-    
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;

@@ -13,16 +13,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.leo.fintech.account.AccountRepository;
-import com.leo.fintech.budget.BudgetRepository;
-import com.leo.fintech.category.CategoryRepository;
 import com.leo.fintech.common.exception.EmailAlreadyExistsException;
 import com.leo.fintech.common.exception.InvalidPasswordException;
 import com.leo.fintech.common.exception.InvalidTokenException;
 import com.leo.fintech.common.exception.UserNotFoundException;
 import com.leo.fintech.email.EmailService;
-import com.leo.fintech.goal.GoalRepository;
-import com.leo.fintech.transaction.TransactionRepository;
 import com.leo.fintech.user.CustomUserDetails;
 import com.leo.fintech.user.User;
 import com.leo.fintech.user.UserDto;
@@ -37,12 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
-
-    private final TransactionRepository transactionRepository;
-    private final BudgetRepository budgetRepository;
-    private final GoalRepository goalRepository;
-    private final AccountRepository accountRepository;
-    private final CategoryRepository categoryRepository;
 
     @Autowired
     private final AuthenticationManager authenticationManager;
@@ -158,11 +147,6 @@ public class AuthService {
             throw new EntityNotFoundException("User not found");
         }
 
-        transactionRepository.deleteAllByUserId(userId);
-        budgetRepository.deleteAllByUserId(userId);
-        goalRepository.deleteAllByUserId(userId);
-        categoryRepository.deleteAllByUserId(userId);
-        accountRepository.deleteAllByUserId(userId);
         userRepository.deleteById(userId);
     }
 

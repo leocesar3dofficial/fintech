@@ -10,9 +10,11 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.leo.fintech.goal.Goal;
 import com.leo.fintech.transaction.Transaction;
 import com.leo.fintech.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -68,4 +70,8 @@ public class Account {
     @OneToMany(mappedBy = "account", orphanRemoval = true)
     @JsonManagedReference
     private final List<Transaction> transactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Goal> goals = new ArrayList<>();
+
 }
