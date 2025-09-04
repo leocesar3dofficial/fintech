@@ -1,5 +1,6 @@
 package com.leo.fintech.common.exception.handler;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import com.leo.fintech.common.exception.ErrorResponse;
 import com.leo.fintech.common.exception.ErrorResponseUtil;
 
 @RestControllerAdvice
+@Order(300)
 public class BusinessExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)

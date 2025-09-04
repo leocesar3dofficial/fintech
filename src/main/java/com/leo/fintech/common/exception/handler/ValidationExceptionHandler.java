@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +18,7 @@ import com.leo.fintech.common.exception.ErrorResponse;
 import com.leo.fintech.common.exception.ErrorResponseUtil;
 
 @RestControllerAdvice
+@Order(100)
 public class ValidationExceptionHandler {
 
         private static final Logger logger = LoggerFactory.getLogger(ValidationExceptionHandler.class);

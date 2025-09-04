@@ -1,5 +1,6 @@
 package com.leo.fintech.common.exception.handler;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,7 @@ import com.leo.fintech.common.exception.InvalidTokenException;
 import com.leo.fintech.common.exception.UserNotFoundException;
 
 @RestControllerAdvice
+@Order(200)
 public class AuthExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)

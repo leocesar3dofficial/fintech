@@ -2,6 +2,7 @@ package com.leo.fintech.common.exception.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -13,6 +14,7 @@ import com.leo.fintech.common.exception.ErrorResponse;
 import com.leo.fintech.common.exception.ErrorResponseUtil;
 
 @RestControllerAdvice
+@Order(400)
 public class DatabaseExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseExceptionHandler.class);
