@@ -14,7 +14,6 @@ import com.leo.fintech.goal.Goal;
 import com.leo.fintech.transaction.Transaction;
 import com.leo.fintech.user.User;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -67,11 +66,11 @@ public class Account {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "account", orphanRemoval = true)
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Transaction> transactions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private final List<Goal> goals = new ArrayList<>();
 
 }

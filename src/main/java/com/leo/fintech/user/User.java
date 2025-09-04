@@ -15,7 +15,6 @@ import com.leo.fintech.budget.Budget;
 import com.leo.fintech.category.Category;
 import com.leo.fintech.goal.Goal;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -64,19 +63,19 @@ public class User {
     @UpdateTimestamp(source = SourceType.DB)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Account> accounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Category> categories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Budget> budgets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<Goal> goals = new ArrayList<>();
 

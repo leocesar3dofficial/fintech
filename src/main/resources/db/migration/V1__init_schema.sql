@@ -1,6 +1,6 @@
 -- =====================================
 -- V1__init_schema.sql
--- Initial schema for finance app
+-- Initial schema for finance app with ON DELETE CASCADE
 -- =====================================
 
 -- === Table: users ===
@@ -77,34 +77,37 @@ CREATE TABLE transactions (
     category_id BIGINT NOT NULL
 );
 
--- === Foreign Key Constraints ===
+-- === Foreign Key Constraints with ON DELETE CASCADE ===
 ALTER TABLE accounts
-ADD CONSTRAINT fk_accounts_user FOREIGN KEY (user_id) REFERENCES users;
+ADD CONSTRAINT fk_accounts_user
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 ALTER TABLE categories
-ADD CONSTRAINT fk_categories_user FOREIGN KEY (user_id) REFERENCES users;
+ADD CONSTRAINT fk_categories_user
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 ALTER TABLE budgets
-ADD CONSTRAINT fk_budgets_user FOREIGN KEY (user_id) REFERENCES users,
-ADD CONSTRAINT fk_budgets_category FOREIGN KEY (category_id) REFERENCES categories;
+ADD CONSTRAINT fk_budgets_user
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_budgets_category
+FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE;
 
 ALTER TABLE goals
-ADD CONSTRAINT fk_goals_user FOREIGN KEY (user_id) REFERENCES users,
-ADD CONSTRAINT fk_goals_account FOREIGN KEY (account_id) REFERENCES accounts;
+ADD CONSTRAINT fk_goals_user
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_goals_account
+FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE;
 
 ALTER TABLE transactions
-ADD CONSTRAINT fk_transactions_account FOREIGN KEY (account_id) REFERENCES accounts,
-ADD CONSTRAINT fk_transactions_category FOREIGN KEY (category_id) REFERENCES categories;
+ADD CONSTRAINT fk_transactions_account
+FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_transactions_category
+FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE;
 
 -- === Indexes (optional for performance) ===
 CREATE INDEX idx_users_email ON users (email);
-
 CREATE INDEX idx_categories_user_id ON categories (user_id);
-
 CREATE INDEX idx_accounts_user_id ON accounts (user_id);
-
 CREATE INDEX idx_budgets_user_id ON budgets (user_id);
-
 CREATE INDEX idx_goals_user_id ON goals (user_id);
-
 CREATE INDEX idx_transactions_account_id ON transactions (account_id);
