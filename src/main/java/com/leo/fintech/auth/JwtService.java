@@ -23,7 +23,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    @Value("${jwt.reset-token.expiration:3600}")
+    @Value("${jwt.reset-token.expiration}")
     private long RESET_TOKEN_EXPIRATION;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
