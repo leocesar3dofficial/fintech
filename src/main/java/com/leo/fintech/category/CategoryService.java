@@ -66,11 +66,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public Boolean deleteCategory(Long id, UUID userId) {
+    public boolean deleteCategory(Long id, UUID userId) {
         Optional<Category> category = categoryRepository.findByIdAndUserId(id, userId);
-        
+
         if (category.isPresent()) {
-            categoryRepository.deleteByIdAndUserId(id, userId);
+            categoryRepository.delete(category.get());
             return true;
         }
 

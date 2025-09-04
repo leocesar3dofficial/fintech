@@ -19,9 +19,17 @@ public class GlobalLoggingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         if (request instanceof HttpServletRequest req) {
-            log.info("[GLOBAL LOG] Incoming request path: " + req.getServletPath());
+            String method = req.getMethod();
+            String fullPath = req.getRequestURI();
+            String queryString = req.getQueryString();
+
+            if (queryString != null) {
+                fullPath += "?" + queryString;
+            }
+
+            log.info("[GLOBAL LOG] Incoming request: {} {}", method, fullPath);
         }
-        
+
         chain.doFilter(request, response);
     }
 }

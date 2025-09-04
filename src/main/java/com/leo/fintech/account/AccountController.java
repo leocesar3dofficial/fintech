@@ -30,7 +30,7 @@ public class AccountController {
     @GetMapping
     public List<AccountDto> getAllAccounts(@AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
-       
+
         return accountService.getUserAccounts(userId);
     }
 
@@ -39,39 +39,34 @@ public class AccountController {
             @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
         Optional<AccountDto> account = accountService.getUserAccountById(id, userId);
-       
+
         return account.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto, 
+    public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto dto,
             @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
         AccountDto created = accountService.createUserAccount(dto, userId);
-       
+
         return ResponseEntity.ok(created);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable("id") Long id, 
+    public ResponseEntity<Void> deleteAccount(@PathVariable("id") Long id,
             @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
-        boolean deleted = accountService.deleteUserAccount(id, userId);
-       
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        accountService.deleteUserAccount(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long id, @Valid @RequestBody AccountDto dto, 
+    public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long id, @Valid @RequestBody AccountDto dto,
             @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
         Optional<AccountDto> updated = accountService.updateUserAccount(id, dto, userId);
-      
+
         return updated.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

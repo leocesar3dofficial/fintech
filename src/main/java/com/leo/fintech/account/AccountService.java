@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.leo.fintech.user.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,13 +53,22 @@ public class AccountService {
     }
 
     @Transactional
-    public boolean deleteUserAccount(Long id, UUID userId) {
+    public void deleteUserAccount(Long id, UUID userId) {
+        Account account = accountRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
+
+        accountRepository.delete(account);
+    }
+
+    @Transactional
+    public boolean deleteAccountIfExists(Long id, UUID userId) {
         Optional<Account> account = accountRepository.findByIdAndUserId(id, userId);
 
         if (account.isPresent()) {
-            accountRepository.deleteByIdAndUserId(id, userId);
+            accountRepository.delete(account.get());
             return true;
         }
+
         return false;
     }
 }
