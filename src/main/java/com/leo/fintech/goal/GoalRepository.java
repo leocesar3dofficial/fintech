@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,5 +19,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     void deleteByIdAndUserId(Long id, UUID userId);
 
     @Modifying
+    @Query("DELETE FROM Goal g WHERE g.user.id = :userId")
     void deleteAllByUserId(UUID userId);
 }

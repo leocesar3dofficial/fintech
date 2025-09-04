@@ -19,7 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findAllByAccount_IdAndAccount_User_Id(Long accountId, UUID userId);
 
     @Modifying
-    @Query("DELETE FROM Transaction t WHERE t.account.id IN (SELECT a.id FROM Account a WHERE a.user.id = :userId)")
+    @Query("DELETE FROM Transaction t WHERE t.account.user.id = :userId")
     void deleteAllByUserId(UUID userId);
 
 }
