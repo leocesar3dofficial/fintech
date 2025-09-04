@@ -1,9 +1,5 @@
 package com.leo.fintech.common.exception.handler;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,13 +19,16 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleEntityNotFound(EntityNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("timestamp", Instant.now());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex, WebRequest request) {
+        logger.debug("Entity not found: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponseUtil.build(
+                HttpStatus.NOT_FOUND,
+                "Not Found",
+                ex.getMessage(),
+                request);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
@@ -38,7 +37,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = ErrorResponseUtil.build(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal server error",
+                "Internal Server Error",
                 "An unexpected error occurred while processing your request",
                 request);
 
