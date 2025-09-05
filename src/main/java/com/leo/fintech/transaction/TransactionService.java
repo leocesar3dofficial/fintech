@@ -1,6 +1,7 @@
 package com.leo.fintech.transaction;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,6 +103,28 @@ public class TransactionService {
             default:
                 throw new IllegalArgumentException("Unsupported bank type: " + bankType);
         }
+    }
+
+    public List<TransactionDto> getUserTransactionsByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        LocalDate actualStartDate = startDate.withDayOfMonth(1);
+        LocalDate actualEndDate = endDate.withDayOfMonth(endDate.lengthOfMonth());
+
+        return transactionRepository.findAllByAccount_User_IdAndDateBetween(userId, actualStartDate, actualEndDate)
+                .stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TransactionDto> getAccountTransactionsByDateRange(Long accountId, UUID userId, LocalDate startDate,
+            LocalDate endDate) {
+        LocalDate actualStartDate = startDate.withDayOfMonth(1);
+        LocalDate actualEndDate = endDate.withDayOfMonth(endDate.lengthOfMonth());
+
+        return transactionRepository.findAllByAccount_IdAndAccount_User_IdAndDateBetween(
+                accountId, userId, actualStartDate, actualEndDate)
+                .stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public List<TransactionDto> getUserTransactions(UUID userId) {

@@ -1,5 +1,8 @@
 package com.leo.fintech.transaction;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,17 +40,55 @@ public class TransactionController {
     @Autowired
     private CsvBankDetector bankDetector;
 
+    private LocalDate parseYearMonth(String yearMonth) {
+        try {
+            YearMonth ym = YearMonth.parse(yearMonth);
+            return ym.atDay(1);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM (e.g., 2024-01)");
+        }
+    }
+
+    private LocalDate getEndOfMonth(String yearMonth) {
+        try {
+            YearMonth ym = YearMonth.parse(yearMonth);
+            return ym.atEndOfMonth();
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM (e.g., 2024-01)");
+        }
+    }
+
     @GetMapping
-    public List<TransactionDto> getAllTransactions(@AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
+    public List<TransactionDto> getAllTransactions(
+            @AuthenticationPrincipal JwtUserPrincipal userPrincipal,
+            @RequestParam(value = "start_date", required = false) String startDate,
+            @RequestParam(value = "end_date", required = false) String endDate) {
+
         UUID userId = UUID.fromString(userPrincipal.getUserId());
+
+        if (startDate != null && endDate != null) {
+            LocalDate start = parseYearMonth(startDate);
+            LocalDate end = parseYearMonth(endDate);
+            return transactionService.getUserTransactionsByDateRange(userId, start, end);
+        }
 
         return transactionService.getUserTransactions(userId);
     }
 
     @GetMapping("/account/{id}")
-    public List<TransactionDto> getAllTransactionsByAccount(@PathVariable("id") Long accountId,
-            @AuthenticationPrincipal JwtUserPrincipal userPrincipal) {
+    public List<TransactionDto> getAllTransactionsByAccount(
+            @PathVariable("id") Long accountId,
+            @AuthenticationPrincipal JwtUserPrincipal userPrincipal,
+            @RequestParam(value = "start_date", required = false) String startDate,
+            @RequestParam(value = "end_date", required = false) String endDate) {
+
         UUID userId = UUID.fromString(userPrincipal.getUserId());
+
+        if (startDate != null && endDate != null) {
+            LocalDate start = parseYearMonth(startDate);
+            LocalDate end = parseYearMonth(endDate);
+            return transactionService.getAccountTransactionsByDateRange(accountId, userId, start, end);
+        }
 
         return transactionService.getAccountTransactions(accountId, userId);
     }
@@ -79,7 +120,7 @@ public class TransactionController {
             }
 
             BankType detectedBank;
-            
+
             try {
                 detectedBank = bankDetector.detectBankTypeFromFile(file);
             } catch (IllegalArgumentException e) {
