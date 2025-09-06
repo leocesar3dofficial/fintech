@@ -40,19 +40,10 @@ public class TransactionController {
     @Autowired
     private CsvBankDetector bankDetector;
 
-    private LocalDate parseYearMonth(String yearMonth) {
+    private LocalDate parseYearMonth(String yearMonth, boolean startOfMonth) {
         try {
             YearMonth ym = YearMonth.parse(yearMonth);
-            return ym.atDay(1);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM (e.g., 2024-01)");
-        }
-    }
-
-    private LocalDate getEndOfMonth(String yearMonth) {
-        try {
-            YearMonth ym = YearMonth.parse(yearMonth);
-            return ym.atEndOfMonth();
+            return startOfMonth ? ym.atDay(1) : ym.atEndOfMonth();
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM (e.g., 2024-01)");
         }
@@ -67,8 +58,8 @@ public class TransactionController {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
 
         if (startDate != null && endDate != null) {
-            LocalDate start = parseYearMonth(startDate);
-            LocalDate end = parseYearMonth(endDate);
+            LocalDate start = parseYearMonth(startDate, true);
+            LocalDate end = parseYearMonth(endDate, false);
             return transactionService.getUserTransactionsByDateRange(userId, start, end);
         }
 
@@ -85,8 +76,8 @@ public class TransactionController {
         UUID userId = UUID.fromString(userPrincipal.getUserId());
 
         if (startDate != null && endDate != null) {
-            LocalDate start = parseYearMonth(startDate);
-            LocalDate end = parseYearMonth(endDate);
+            LocalDate start = parseYearMonth(startDate, true);
+            LocalDate end = parseYearMonth(endDate, false);
             return transactionService.getAccountTransactionsByDateRange(accountId, userId, start, end);
         }
 
